@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Calendar, MapPin, Users, ArrowRight, ExternalLink } from 'lucide-react'
 import type { UIEvent } from '@/lib/queries'
-import { SectionHeader } from '@/components/ui/GlassCard'
 
 function formatDate(dateStr: string) {
   const d = new Date(dateStr)
@@ -143,11 +142,15 @@ export function UpcomingEvents({ events }: { events: UIEvent[] }) {
 
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-          <SectionHeader
-            label="Events"
-            title={<>Upcoming <span className="text-gold-gradient">Shows</span></>}
-            subtitle="Catch YardStyle artists and sound system at events across the globe."
-          />
+          <div>
+            <p className="section-label mb-4">Events</p>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4 leading-tight">
+              Upcoming <span className="text-gold-gradient">Shows</span>
+            </h2>
+            <p className="text-white/50 text-base max-w-2xl leading-relaxed">
+              Catch YardStyle artists and sound system at events across the globe.
+            </p>
+          </div>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}

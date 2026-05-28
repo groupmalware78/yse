@@ -14,6 +14,7 @@ export async function getArtistsForUI() {
     orderBy: { name: 'asc' },
   })
   return rows.map(a => ({
+    id: a.id,
     slug: a.slug,
     name: a.name,
     genre: a.genre,

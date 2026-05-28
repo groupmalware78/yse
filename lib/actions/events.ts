@@ -2,6 +2,9 @@
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/db'
 
+const isSQLite = process.env.DATABASE_URL?.startsWith('file:') ?? false
+const serializeArr = (v: string[]) => isSQLite ? JSON.stringify(v) as unknown as string[] : v
+
 export async function getEvents() {
   return prisma.event.findMany({ orderBy: { date: 'asc' } })
 }
@@ -18,7 +21,8 @@ export async function createEvent(data: {
   featured?: boolean
   description: string
 }) {
-  await prisma.event.create({ data })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await prisma.event.create({ data: { ...data, artists: serializeArr(data.artists) } as any })
   revalidatePath('/admin/events')
   revalidatePath('/')
 }
@@ -35,7 +39,9 @@ export async function updateEvent(id: number, data: Partial<{
   featured: boolean
   description: string
 }>) {
-  await prisma.event.update({ where: { id }, data })
+  const payload = data.artists !== undefined ? { ...data, artists: serializeArr(data.artists) } : data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await prisma.event.update({ where: { id }, data: payload as any })
   revalidatePath('/admin/events')
   revalidatePath('/')
 }

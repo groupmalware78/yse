@@ -248,7 +248,8 @@ async function main() {
   ]
 
   if (await prisma.event.count() === 0) {
-    await prisma.event.createMany({ data: eventsData.map(e => ({ ...e, artists: arr(e.artists) })) })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await prisma.event.createMany({ data: eventsData.map(e => ({ ...e, artists: arr(e.artists) })) as any })
     console.log(`  ✓ ${eventsData.length} events`)
   } else {
     console.log('  – Events already seeded, skipping')
@@ -289,7 +290,8 @@ async function main() {
   ]
 
   if (await prisma.soundPackage.count() === 0) {
-    await prisma.soundPackage.createMany({ data: packagesData.map(p => ({ ...p, features: arr(p.features) })) })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await prisma.soundPackage.createMany({ data: packagesData.map(p => ({ ...p, features: arr(p.features) })) as any })
     console.log(`  ✓ ${packagesData.length} sound packages`)
   } else {
     console.log('  – Sound packages already seeded, skipping')

@@ -31,7 +31,14 @@ const socials = [
   { icon: Music, href: '#', label: 'Spotify' },
 ]
 
-export function Footer() {
+interface FooterSettings {
+  contactPhone: string
+  contactEmail: string
+  address: string
+  whatsapp: string
+}
+
+export function Footer({ settings }: { settings: FooterSettings }) {
   return (
     <footer className="relative border-t border-white/5 overflow-hidden">
       {/* background decoration */}
@@ -103,26 +110,26 @@ export function Footer() {
             <p className="text-gold text-xs font-bold tracking-widest uppercase mb-6">Contact</p>
             <ul className="space-y-4">
               <li>
-                <a href="tel:+18761234567" className="flex items-center gap-3 text-white/40 hover:text-white text-sm transition-colors">
+                <a href={`tel:${settings.contactPhone.replace(/\D/g, '')}`} className="flex items-center gap-3 text-white/40 hover:text-white text-sm transition-colors">
                   <Phone size={13} className="text-gold flex-shrink-0" />
-                  +1 (876) 123-4567
+                  {settings.contactPhone}
                 </a>
               </li>
               <li>
-                <a href="mailto:info@yardstylement.com" className="flex items-center gap-3 text-white/40 hover:text-white text-sm transition-colors">
+                <a href={`mailto:${settings.contactEmail}`} className="flex items-center gap-3 text-white/40 hover:text-white text-sm transition-colors">
                   <Mail size={13} className="text-gold flex-shrink-0" />
-                  info@yardstylement.com
+                  {settings.contactEmail}
                 </a>
               </li>
               <li>
                 <div className="flex items-start gap-3 text-white/40 text-sm">
                   <MapPin size={13} className="text-gold flex-shrink-0 mt-0.5" />
-                  <span>13 Studio Lane, Kingston 6<br />Jamaica, W.I.</span>
+                  <span>{settings.address}</span>
                 </div>
               </li>
               <li>
                 <a
-                  href="https://wa.me/18761234567"
+                  href={`https://wa.me/${settings.whatsapp.replace(/\D/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase mt-2 transition-all duration-300"

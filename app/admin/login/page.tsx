@@ -3,7 +3,7 @@ import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Eye, EyeOff, Lock, User, AlertCircle, Loader2 } from 'lucide-react'
-import { login } from '@/lib/adminAuth'
+import { login } from '@/lib/actions/auth'
 
 function LoginForm() {
   const router = useRouter()
@@ -21,15 +21,12 @@ function LoginForm() {
     setLoading(true)
     setError('')
 
-    // Simulate network delay for realism
-    await new Promise(r => setTimeout(r, 800))
-
-    const result = login(username, password)
-    if (result.success) {
+    const result = await login(username, password)
+    if (!result.error) {
       router.push(from)
       router.refresh()
     } else {
-      setError(result.error || 'Login failed')
+      setError(result.error)
       setLoading(false)
     }
   }

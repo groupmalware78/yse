@@ -1,9 +1,8 @@
-'use client'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Play, ExternalLink, Instagram, Twitter, Youtube, Music, Calendar, MapPin, Award, Mic, Download } from 'lucide-react'
-import { artists } from '@/lib/data'
+import { getArtistsForUI } from '@/lib/queries'
 import { AudioVisualizer } from '@/components/ui/AudioVisualizer'
 
 const genreColors: Record<string, string> = {
@@ -15,8 +14,9 @@ const genreColors: Record<string, string> = {
   'DJ / Sound System': '#00ffcc',
 }
 
-export default function ArtistProfilePage({ params }: { params: { slug: string } }) {
+export default async function ArtistProfilePage({ params }: { params: { slug: string } }) {
   const { slug } = params
+  const artists = await getArtistsForUI()
   const artist = artists.find(a => a.slug === slug)
 
   if (!artist) notFound()

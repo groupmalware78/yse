@@ -2,17 +2,10 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, Play, Instagram, Music } from 'lucide-react'
-import { artists } from '@/lib/data'
+import type { UIArtist } from '@/lib/queries'
 import { SectionHeader } from '@/components/ui/GlassCard'
 
-const colorMap: Record<string, string> = {
-  '#d4af37': 'from-yellow-600/20 to-transparent',
-  '#00ffcc': 'from-cyan-400/20 to-transparent',
-  '#39ff14': 'from-green-400/20 to-transparent',
-  '#ff0077': 'from-pink-500/20 to-transparent',
-}
-
-function ArtistCard({ artist, index }: { artist: typeof artists[0]; index: number }) {
+function ArtistCard({ artist, index }: { artist: UIArtist; index: number }) {
   const genreColors: Record<string, string> = {
     Dancehall: '#d4af37',
     Reggae: '#00ffcc',
@@ -137,7 +130,7 @@ function ArtistCard({ artist, index }: { artist: typeof artists[0]; index: numbe
   )
 }
 
-export function FeaturedArtists() {
+export function FeaturedArtists({ artists }: { artists: UIArtist[] }) {
   const featured = artists.slice(0, 6)
 
   return (

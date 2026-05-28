@@ -1,11 +1,9 @@
-'use client'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Users, Disc, Calendar, BookOpen, Volume2, TrendingUp, ArrowRight, Clock } from 'lucide-react'
+import { Users, Disc, Calendar, BookOpen, ArrowRight, Clock } from 'lucide-react'
 import { AdminHeader, StatCard } from '@/components/admin/AdminHeader'
-import { artists, releases, events } from '@/lib/data'
-import { getBookings, getBookingStats } from '@/lib/mockBookings'
-import { getAdminInfo } from '@/lib/adminAuth'
+import { prisma } from '@/lib/db'
+import { getSession } from '@/lib/actions/auth'
 
 const statusColors: Record<string, string> = {
   pending: '#d4af37',
@@ -21,11 +19,26 @@ const statusBg: Record<string, string> = {
   cancelled: 'rgba(255,0,119,0.12)',
 }
 
-export default function DashboardPage() {
-  const admin = getAdminInfo()
-  const bookings = getBookings()
-  const stats = getBookingStats()
-  const recentBookings = bookings.slice(0, 5)
+export default async function DashboardPage() {
+  const session = await getSession()
+
+  const [artistCount, releaseCount, eventCount, bookingStats, recentBookings, upcomingEvents] =
+    await Promise.all([
+      prisma.artist.count(),
+      prisma.release.count(),
+      prisma.event.count(),
+      Promise.all([
+        prisma.booking.count(),
+        prisma.booking.count({ where: { status: 'pending' } }),
+        prisma.booking.count({ where: { status: 'confirmed' } }),
+        prisma.booking.count({ where: { status: 'completed' } }),
+        prisma.booking.count({ where: { status: 'cancelled' } }),
+      ]).then(([total, pending, confirmed, completed, cancelled]) => ({
+        total, pending, confirmed, completed, cancelled,
+      })),
+      prisma.booking.findMany({ orderBy: { submittedAt: 'desc' }, take: 5 }),
+      prisma.event.findMany({ orderBy: { date: 'asc' }, take: 3 }),
+    ])
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
@@ -33,33 +46,33 @@ export default function DashboardPage() {
   return (
     <div>
       <AdminHeader
-        title={`${greeting}, ${admin?.name ?? 'Admin'} 👋`}
+        title={`${greeting}, ${session?.name ?? 'Admin'}`}
         subtitle="Here's what's happening with YardStyle today."
       />
 
       {/* Stats */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
-          <StatCard label="Total Artists" value={artists.length} change="2" icon={Users} color="#d4af37" />
+          <StatCard label="Total Artists" value={artistCount} icon={Users} color="#d4af37" />
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <StatCard label="Releases" value={releases.length} change="1" icon={Disc} color="#00ffcc" />
+          <StatCard label="Releases" value={releaseCount} icon={Disc} color="#00ffcc" />
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <StatCard label="Upcoming Events" value={events.length} change="3" icon={Calendar} color="#39ff14" />
+          <StatCard label="Upcoming Events" value={eventCount} icon={Calendar} color="#39ff14" />
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-          <StatCard label="Pending Bookings" value={stats.pending} change={String(stats.pending)} icon={BookOpen} color="#d4af37" />
+          <StatCard label="Pending Bookings" value={bookingStats.pending} icon={BookOpen} color="#d4af37" />
         </motion.div>
       </div>
 
       {/* Booking breakdown */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         {[
-          { label: 'Total Bookings', val: stats.total, color: '#fff' },
-          { label: 'Confirmed', val: stats.confirmed, color: '#39ff14' },
-          { label: 'Completed', val: stats.completed, color: '#00ffcc' },
-          { label: 'Cancelled', val: stats.cancelled, color: '#ff0077' },
+          { label: 'Total Bookings', val: bookingStats.total, color: '#fff' },
+          { label: 'Confirmed', val: bookingStats.confirmed, color: '#39ff14' },
+          { label: 'Completed', val: bookingStats.completed, color: '#00ffcc' },
+          { label: 'Cancelled', val: bookingStats.cancelled, color: '#ff0077' },
         ].map((s, i) => (
           <motion.div
             key={s.label}
@@ -91,7 +104,6 @@ export default function DashboardPage() {
               View all <ArrowRight size={12} />
             </Link>
           </div>
-
           <div className="divide-y divide-white/5">
             {recentBookings.map(booking => (
               <div key={booking.id} className="flex items-center gap-4 p-4 hover:bg-white/3 transition-colors">
@@ -107,9 +119,9 @@ export default function DashboardPage() {
                 <span
                   className="flex-shrink-0 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full capitalize"
                   style={{
-                    background: statusBg[booking.status],
-                    color: statusColors[booking.status],
-                    border: `1px solid ${statusColors[booking.status]}25`,
+                    background: statusBg[booking.status] ?? 'rgba(255,255,255,0.08)',
+                    color: statusColors[booking.status] ?? '#fff',
+                    border: `1px solid ${statusColors[booking.status] ?? '#fff'}25`,
                   }}
                 >
                   {booking.status}
@@ -121,7 +133,6 @@ export default function DashboardPage() {
 
         {/* Quick actions + upcoming events */}
         <div className="space-y-5">
-          {/* Quick actions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -152,7 +163,6 @@ export default function DashboardPage() {
             </div>
           </motion.div>
 
-          {/* Upcoming events */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -164,7 +174,7 @@ export default function DashboardPage() {
               <Link href="/admin/events" className="text-gold text-[10px] font-semibold">View all</Link>
             </div>
             <div className="space-y-3">
-              {events.slice(0, 3).map(event => (
+              {upcomingEvents.map(event => (
                 <div key={event.id} className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg flex-shrink-0 bg-gold/12 border border-gold/20 flex flex-col items-center justify-center text-gold text-center">
                     <span className="text-sm font-black leading-none">{new Date(event.date).getDate()}</span>

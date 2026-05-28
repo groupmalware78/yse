@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Calendar, MapPin, Users, ArrowRight, ExternalLink } from 'lucide-react'
-import { events } from '@/lib/data'
+import type { UIEvent } from '@/lib/queries'
 import { SectionHeader } from '@/components/ui/GlassCard'
 
 function formatDate(dateStr: string) {
@@ -22,7 +22,7 @@ const typeColors: Record<string, string> = {
   'Club Night': '#ff0077',
 }
 
-function EventCard({ event, index, featured = false }: { event: typeof events[0]; index: number; featured?: boolean }) {
+function EventCard({ event, index, featured = false }: { event: UIEvent; index: number; featured?: boolean }) {
   const date = formatDate(event.date)
   const accent = typeColors[event.type] || '#d4af37'
 
@@ -130,7 +130,7 @@ function EventCard({ event, index, featured = false }: { event: typeof events[0]
   )
 }
 
-export function UpcomingEvents() {
+export function UpcomingEvents({ events }: { events: UIEvent[] }) {
   const featured = events.filter(e => e.featured)
   const rest = events.filter(e => !e.featured)
 

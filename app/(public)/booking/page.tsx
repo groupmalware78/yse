@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { motion } from 'framer-motion'
 import { Calendar, Clock, Users, DollarSign, Upload, Check, ArrowRight, Phone, Mail, ChevronRight } from 'lucide-react'
+import { createBooking } from '@/lib/actions/bookings'
 
 const services = [
   { id: 'artist', label: 'Artist Performance', icon: '🎤', desc: 'Book a YardStyle artist for your event' },
@@ -64,6 +65,8 @@ export default function BookingPage() {
   const [step, setStep] = useState(0)
   const [selectedService, setSelectedService] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [bookingRef, setBookingRef] = useState('')
+  const [, startTransition] = useTransition()
   const [form, setForm] = useState({
     eventName: '',
     eventDate: '',
@@ -85,7 +88,26 @@ export default function BookingPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    const ref = 'YSE-' + Math.random().toString(36).slice(2, 8).toUpperCase()
+    setBookingRef(ref)
     setSubmitted(true)
+    startTransition(async () => {
+      await createBooking({
+        service: selectedService,
+        eventName: form.eventName,
+        eventDate: form.eventDate,
+        venue: form.venue,
+        city: form.city,
+        guestCount: form.guestCount,
+        budget: form.budget,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        organization: form.organization,
+        notes: form.notes,
+        genre: form.genre,
+      })
+    })
   }
 
   if (submitted) {
@@ -115,7 +137,7 @@ export default function BookingPage() {
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Calendar size={14} className="text-gold flex-shrink-0" />
-                <span className="text-white/50">Reference: <span className="text-gold font-bold">YSE-{Math.random().toString(36).slice(2,8).toUpperCase()}</span></span>
+                <span className="text-white/50">Reference: <span className="text-gold font-bold">{bookingRef}</span></span>
               </div>
             </div>
             <button

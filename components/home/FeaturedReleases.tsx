@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Play, ExternalLink, ArrowRight, Disc } from 'lucide-react'
-import { releases } from '@/lib/data'
+import type { UIRelease } from '@/lib/queries'
 import { SectionHeader } from '@/components/ui/GlassCard'
 
 const genreColors: Record<string, string> = {
@@ -14,7 +14,7 @@ const genreColors: Record<string, string> = {
   'Sound System': '#39ff14',
 }
 
-function AlbumCard({ release, index }: { release: typeof releases[0]; index: number }) {
+function AlbumCard({ release, index }: { release: UIRelease; index: number }) {
   const accent = genreColors[release.genre] || '#d4af37'
   const letters = release.title.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 
@@ -121,7 +121,7 @@ function AlbumCard({ release, index }: { release: typeof releases[0]; index: num
   )
 }
 
-export function FeaturedReleases() {
+export function FeaturedReleases({ releases }: { releases: UIRelease[] }) {
   const featured = releases.filter(r => r.featured)
   const recent = releases.filter(r => !r.featured).slice(0, 4)
 

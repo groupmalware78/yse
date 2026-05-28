@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
-import '../globals.css'
 
 export const metadata: Metadata = {
   title: 'YardStyle CMS',

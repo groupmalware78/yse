@@ -1,10 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
-import { FloatingPlayer } from '@/components/layout/FloatingPlayer'
-import { CustomCursor } from '@/components/ui/CustomCursor'
-import { PageTransition } from '@/components/layout/PageTransition'
 
 export const metadata: Metadata = {
   title: 'YardStyle Entertainment | Powering Music. Elevating Culture.',
@@ -21,11 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <body className="bg-yse-dark text-white antialiased">
-        <CustomCursor />
-        <Navbar />
-        <PageTransition>{children}</PageTransition>
-        <Footer />
-        <FloatingPlayer />
+        {children}
       </body>
     </html>
   )

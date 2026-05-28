@@ -140,11 +140,11 @@ export function UpcomingEvents({ events }: { events: UIEvent[] }) {
       <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, #060606 0%, #0a0808 50%, #060606 100%)' }} />
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-72 rounded-full bg-gold/5 blur-[100px]" />
 
-      <div className="max-w-7xl mx-auto px-5 md:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
             <p className="section-label mb-4">Events</p>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4 leading-tight">
+            <h2 className="text-white text-4xl md:text-5xl font-black tracking-tight mb-4 leading-tight">
               Upcoming <span className="text-gold-gradient">Shows</span>
             </h2>
             <p className="text-white/50 text-base max-w-2xl leading-relaxed">

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getSoundPackagesForUI } from '@/lib/queries'
 import { SoundSystemClient } from './SoundSystemClient'
 

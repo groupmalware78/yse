@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getReleasesForUI } from '@/lib/queries'
 import { CatalogClient } from './CatalogClient'
 

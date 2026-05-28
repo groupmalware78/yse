@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getArtistsForUI } from '@/lib/queries'
 import { ArtistsClient } from './ArtistsClient'
 

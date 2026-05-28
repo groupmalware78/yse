@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Artist {
+  id           Int           @id @default(autoincrement())
+  slug         String        @unique
+  name         String
+  genre        String
+  subGenre     String
+  origin       String
+  bio          String
+  longBio      String
+  image        String?
+  color        String        @default("#d4af37")
+  streams      String        @default("0")
+  shows        String        @default("0")
+  albums       Int           @default(0)
+  awards       Int           @default(0)
+  instagramUrl String?
+  twitterUrl   String?
+  youtubeUrl   String?
+  spotifyUrl   String?
+  tracks       Track[]
+  artistAlbums ArtistAlbum[]
+  artistShows  ArtistShow[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Track {
+  id       Int    @id @default(autoincrement())
+  title    String
+  duration String
+  plays    String
+  album    String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId Int
+}
+
+model ArtistAlbum {
+  id       Int    @id @default(autoincrement())
+  title    String
+  year     Int
+  tracks   Int
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId Int
+}
+
+model ArtistShow {
+  id       Int    @id @default(autoincrement())
+  date     String
+  venue    String
+  city     String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId Int
+}
+
+model Release {
+  id         Int      @id @default(autoincrement())
+  title      String
+  artist     String
+  artistSlug String
+  type       String
+  year       Int
+  genre      String
+  tracks     Int
+  label      String   @default("YardStyle Entertainment")
+  spotifyUrl String?
+  appleUrl   String?
+  youtubeUrl String?
+  tidalUrl   String?
+  featured   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  date        String
+  time        String
+  venue       String
+  city        String
+  type        String
+  artists     String   @default("[]")
+  tickets     String?
+  featured    Boolean  @default(false)
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Booking {
+  id           String   @id @default(cuid())
+  ref          String   @unique
+  service      String
+  eventName    String
+  eventDate    String
+  venue        String   @default("")
+  city         String
+  guestCount   String
+  budget       String
+  name         String
+  email        String
+  phone        String
+  organization String?
+  notes        String?
+  status       String   @default("pending")
+  genre        String?
+  submittedAt  DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SoundPackage {
+  id         Int      @id @default(autoincrement())
+  name       String
+  tagline    String
+  priceRange String
+  capacity   String
+  duration   String
+  features   String   @default("[]")
+  popular    Boolean  @default(false)
+  color      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("manager")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteSettings {
+  id           Int      @id @default(1)
+  siteName     String   @default("YardStyle Entertainment")
+  tagline      String   @default("Powering Music. Elevating Culture.")
+  contactEmail String   @default("info@yardstylement.com")
+  contactPhone String   @default("+1 (876) 123-4567")
+  whatsapp     String   @default("+18761234567")
+  address      String   @default("13 Studio Lane, Kingston 6, Jamaica")
+  updatedAt    DateTime @updatedAt
+}

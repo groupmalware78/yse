@@ -1,5 +1,13 @@
 import { prisma } from './db'
 
+function parseArray(val: unknown): string[] {
+  if (Array.isArray(val)) return val as string[]
+  if (typeof val === 'string') {
+    try { return JSON.parse(val) } catch { return [] }
+  }
+  return []
+}
+
 export async function getArtistsForUI() {
   const rows = await prisma.artist.findMany({
     include: { tracks: true, artistAlbums: true, artistShows: true },
@@ -64,7 +72,7 @@ export async function getEventsForUI() {
     venue: e.venue,
     city: e.city,
     type: e.type,
-    artists: e.artists,
+    artists: parseArray(e.artists),
     tickets: e.tickets ?? '#',
     featured: e.featured,
     description: e.description,
@@ -82,7 +90,7 @@ export async function getSoundPackagesForUI() {
     priceRange: p.priceRange,
     capacity: p.capacity,
     duration: p.duration,
-    features: p.features,
+    features: parseArray(p.features),
     popular: p.popular,
     color: p.color ?? 'rgba(255,255,255,0.05)',
   }))

@@ -1,9 +1,19 @@
+import { config } from 'dotenv'
+config()
+
 import { PrismaClient } from '../lib/generated/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaLibSql } from '@prisma/adapter-libsql'
 import { hash } from 'bcryptjs'
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
+const url = process.env.DATABASE_URL!
+const isSQLite = url.startsWith('file:')
+const adapter = isSQLite
+  ? new PrismaLibSql({ url })
+  : new PrismaPg({ connectionString: url })
 const prisma = new PrismaClient({ adapter })
+
+const arr = (v: string[]) => isSQLite ? JSON.stringify(v) as unknown as string[] : v
 
 async function main() {
   console.log('🌱 Seeding database...')
@@ -238,7 +248,7 @@ async function main() {
   ]
 
   if (await prisma.event.count() === 0) {
-    await prisma.event.createMany({ data: eventsData })
+    await prisma.event.createMany({ data: eventsData.map(e => ({ ...e, artists: arr(e.artists) })) })
     console.log(`  ✓ ${eventsData.length} events`)
   } else {
     console.log('  – Events already seeded, skipping')
@@ -279,7 +289,7 @@ async function main() {
   ]
 
   if (await prisma.soundPackage.count() === 0) {
-    await prisma.soundPackage.createMany({ data: packagesData })
+    await prisma.soundPackage.createMany({ data: packagesData.map(p => ({ ...p, features: arr(p.features) })) })
     console.log(`  ✓ ${packagesData.length} sound packages`)
   } else {
     console.log('  – Sound packages already seeded, skipping')

@@ -38,3 +38,6 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+prisma/dev.db
+prisma/dev.db-shm
+prisma/dev.db-wal

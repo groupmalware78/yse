@@ -192,18 +192,20 @@ async function main() {
     },
   ]
 
-  for (const { tracks, artistAlbums, artistShows, ...artist } of artistData) {
-    const created = await prisma.artist.upsert({
-      where: { slug: artist.slug },
-      update: {},
-      create: {
-        ...artist,
-        tracks: { create: tracks },
-        artistAlbums: { create: artistAlbums },
-        artistShows: { create: artistShows },
-      },
-    })
-    console.log(`  ✓ Artist: ${created.name}`)
+  if (await prisma.artist.count() === 0) {
+    for (const { tracks, artistAlbums, artistShows, ...artist } of artistData) {
+      const created = await prisma.artist.create({
+        data: {
+          ...artist,
+          tracks: { create: tracks },
+          artistAlbums: { create: artistAlbums },
+          artistShows: { create: artistShows },
+        },
+      })
+      console.log(`  ✓ Artist: ${created.name}`)
+    }
+  } else {
+    console.log('  – Artists already seeded, skipping')
   }
 
   // Releases
@@ -218,14 +220,12 @@ async function main() {
     { title: 'Sound Clashes: Live Recordings', artist: 'DJ Yardie Flash', artistSlug: 'dj-yardie-flash', type: 'Live Album', year: 2023, genre: 'Sound System', tracks: 5, featured: false },
   ]
 
-  for (const release of releasesData) {
-    await prisma.release.upsert({
-      where: { id: releasesData.indexOf(release) + 1 },
-      update: {},
-      create: release,
-    })
+  if (await prisma.release.count() === 0) {
+    await prisma.release.createMany({ data: releasesData })
+    console.log(`  ✓ ${releasesData.length} releases`)
+  } else {
+    console.log('  – Releases already seeded, skipping')
   }
-  console.log(`  ✓ ${releasesData.length} releases`)
 
   // Events
   const eventsData = [
@@ -237,9 +237,12 @@ async function main() {
     { title: 'Tokyo Sound System Experience', date: '2026-10-04', time: '8:00 PM', venue: 'Oath', city: 'Tokyo, Japan', type: 'Club Night', artists: ['DJ Yardie Flash'], tickets: '#', featured: false, description: 'YardStyle Sound brings authentic Jamaican sound system culture to the heart of Tokyo.' },
   ]
 
-  await prisma.event.deleteMany()
-  await prisma.event.createMany({ data: eventsData })
-  console.log(`  ✓ ${eventsData.length} events`)
+  if (await prisma.event.count() === 0) {
+    await prisma.event.createMany({ data: eventsData })
+    console.log(`  ✓ ${eventsData.length} events`)
+  } else {
+    console.log('  – Events already seeded, skipping')
+  }
 
   // Sound packages
   const packagesData = [
@@ -275,9 +278,12 @@ async function main() {
     },
   ]
 
-  await prisma.soundPackage.deleteMany()
-  await prisma.soundPackage.createMany({ data: packagesData })
-  console.log(`  ✓ ${packagesData.length} sound packages`)
+  if (await prisma.soundPackage.count() === 0) {
+    await prisma.soundPackage.createMany({ data: packagesData })
+    console.log(`  ✓ ${packagesData.length} sound packages`)
+  } else {
+    console.log('  – Sound packages already seeded, skipping')
+  }
 
   // Sample bookings
   const bookingsData = [
@@ -286,14 +292,12 @@ async function main() {
     { ref: 'YSE-C2P6Y1', service: 'DJ / Selector', eventName: 'Dancehall Fridays', eventDate: '2026-06-14', city: 'New York, USA', guestCount: '100–500', budget: '$1,500 – $5,000', name: 'Damien Clarke', email: 'dclarke@clubpriv.com', phone: '+1 (718) 555-0234', organization: 'Club Privilege NYC', notes: 'Weekly residency interest.', status: 'pending', genre: 'Dancehall' },
   ]
 
-  for (const booking of bookingsData) {
-    await prisma.booking.upsert({
-      where: { ref: booking.ref },
-      update: {},
-      create: booking,
-    })
+  if (await prisma.booking.count() === 0) {
+    await prisma.booking.createMany({ data: bookingsData })
+    console.log(`  ✓ ${bookingsData.length} sample bookings`)
+  } else {
+    console.log('  – Bookings already exist, skipping')
   }
-  console.log(`  ✓ ${bookingsData.length} sample bookings`)
 
   console.log('\n✅ Database seeded successfully!')
 }

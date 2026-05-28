@@ -107,7 +107,7 @@ export function Navbar() {
       </motion.header>
 
       {/* Mobile full-screen menu */}
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {menuOpen && (
           <motion.div
             initial={{ opacity: 0 }}

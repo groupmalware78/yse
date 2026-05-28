@@ -41,7 +41,7 @@ export function FloatingPlayer() {
         <div className="progress-fill" style={{ width: `${progress}%` }} />
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {!minimized && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}

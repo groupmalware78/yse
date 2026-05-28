@@ -40,10 +40,10 @@ export function AudioVisualizer({ barCount = 32, color = '#d4af37', height = 60,
           ref={el => { if (el) barsRef.current[i] = el }}
           className="flex-1 rounded-t-sm transition-all"
           style={{
-            height: `${20 + Math.random() * 60}%`,
+            height: '20%',
             background: `linear-gradient(180deg, ${color} 0%, ${color}55 100%)`,
             minWidth: 2,
-            transitionDuration: `${150 + Math.random() * 150}ms`,
+            transitionDuration: '200ms',
             transitionTimingFunction: 'ease-in-out',
           }}
         />
@@ -80,7 +80,8 @@ export function WaveformBars({ className = '' }: { className?: string }) {
     <div className={`audio-wave ${className}`} aria-hidden="true">
       {Array.from({ length: bars }).map((_, i) => {
         const delay = (i * 0.05) % 0.8
-        const duration = 0.6 + Math.random() * 0.6
+        const duration = 0.6 + (i % 5) * 0.12
+        const height = 4 + (i % 8) * 2
         return (
           <div
             key={i}
@@ -91,7 +92,7 @@ export function WaveformBars({ className = '' }: { className?: string }) {
                 '--delay': `${delay}s`,
                 animationDelay: `${delay}s`,
                 animationDuration: `${duration}s`,
-                height: 4 + Math.random() * 16,
+                height,
               } as React.CSSProperties
             }
           />

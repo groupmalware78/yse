@@ -113,7 +113,7 @@ export function SoundSystemTeaser() {
                     {Array.from({ length: 8 }).map((_, i) => (
                       <motion.div
                         key={i}
-                        animate={{ height: [8, 30 + Math.random() * 10, 8] }}
+                        animate={{ height: [8, 25 + (i % 4) * 5, 8] }}
                         transition={{ duration: 0.4 + i * 0.05, repeat: Infinity }}
                         className="w-1.5 bg-gold rounded-full"
                         style={{ height: 8 }}

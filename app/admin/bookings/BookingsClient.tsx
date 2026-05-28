@@ -5,7 +5,7 @@ import { Search, Trash2, CheckCircle, XCircle, ChevronDown, ChevronUp } from 'lu
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { updateBookingStatus, deleteBooking } from '@/lib/actions/bookings'
 import { useRouter } from 'next/navigation'
-import type { Booking } from '@prisma/client'
+import type { Booking } from '@/lib/generated/prisma/client'
 
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
 

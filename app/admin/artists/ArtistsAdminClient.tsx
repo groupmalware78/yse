@@ -14,7 +14,7 @@ const genreColors: Record<string, string> = {
   'Reggae / Dub': '#d4af37', 'Afrobeats / Reggae': '#ff0077', 'DJ / Sound System': '#00ffcc',
 }
 
-type FormData = { name: string; genre: string; subGenre: string; origin: string; bio: string; longBio: string; image: string }
+type FormData = { name: string; genre: string; subGenre: string; origin: string; bio: string; longBio: string; image: string; streams: string; shows: string; albums: string; awards: string }
 
 function ArtistModal({ artist, onSave, onClose, saving }: {
   artist: Partial<UIArtist> | null
@@ -26,6 +26,8 @@ function ArtistModal({ artist, onSave, onClose, saving }: {
     name: artist?.name ?? '', genre: artist?.genre ?? '', subGenre: artist?.subGenre ?? '',
     origin: artist?.origin ?? '', bio: artist?.bio ?? '', longBio: artist?.longBio ?? '',
     image: artist?.image ?? '',
+    streams: artist?.stats?.streams ?? '0', shows: artist?.stats?.shows ?? '0',
+    albums: String(artist?.stats?.albums ?? 0), awards: String(artist?.stats?.awards ?? 0),
   })
   const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }))
   const fileRef = useRef<HTMLInputElement>(null)
@@ -96,6 +98,22 @@ function ArtistModal({ artist, onSave, onClose, saving }: {
               <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Origin</label>
               <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.origin} onChange={e => update('origin', e.target.value)} placeholder="Kingston, Jamaica" />
             </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Streams</label>
+              <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.streams} onChange={e => update('streams', e.target.value)} placeholder="e.g. 1.2M" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Shows</label>
+              <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.shows} onChange={e => update('shows', e.target.value)} placeholder="e.g. 45" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Albums</label>
+              <input type="number" min={0} className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.albums} onChange={e => update('albums', e.target.value)} placeholder="0" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Awards</label>
+              <input type="number" min={0} className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.awards} onChange={e => update('awards', e.target.value)} placeholder="0" />
+            </div>
             <div className="col-span-2">
               <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Short Bio</label>
               <textarea rows={3} className="input-dark w-full px-4 py-3 rounded-xl text-sm resize-none" value={form.bio} onChange={e => update('bio', e.target.value)} />
@@ -135,7 +153,12 @@ export function ArtistsAdminClient({ initialArtists }: { initialArtists: UIArtis
   const handleSave = (form: FormData) => {
     setSaving(true)
     startTransition(async () => {
-      const payload = { ...form, image: form.image || undefined }
+      const payload = {
+        ...form,
+        image: form.image || undefined,
+        albums: parseInt(form.albums) || 0,
+        awards: parseInt(form.awards) || 0,
+      }
       if (editing?.id) {
         await updateArtist(editing.id, payload)
       } else {

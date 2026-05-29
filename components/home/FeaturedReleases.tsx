@@ -5,6 +5,8 @@ import { Play, ExternalLink, ArrowRight, Disc } from 'lucide-react'
 import type { UIRelease } from '@/lib/queries'
 import { SectionHeader } from '@/components/ui/GlassCard'
 
+const hasUrl = (url: string | null | undefined) => !!url && url.trim() !== '' && url.trim() !== '#'
+
 const genreColors: Record<string, string> = {
   Dancehall: '#d4af37',
   'Roots Reggae': '#00ffcc',
@@ -105,16 +107,23 @@ function AlbumCard({ release, index }: { release: UIRelease; index: number }) {
               { href: release.streaming.spotify, label: '♫ Spotify' },
               { href: release.streaming.apple, label: '♪ Apple' },
               { href: release.streaming.youtube, label: '▶ YT' },
-            ].map(s => (
+            ].map(s => hasUrl(s.href) ? (
               <a
                 key={s.label}
-                href={s.href}
+                href={s.href!}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 text-center py-1.5 glass rounded-lg text-[10px] font-semibold text-white/40 hover:text-white transition-colors border border-transparent hover:border-white/10"
               >
                 {s.label}
               </a>
+            ) : (
+              <span
+                key={s.label}
+                className="flex-1 text-center py-1.5 glass rounded-lg text-[10px] font-semibold text-white/15 border border-transparent cursor-not-allowed opacity-40"
+              >
+                {s.label}
+              </span>
             ))}
           </div>
         </div>
@@ -129,9 +138,9 @@ export function FeaturedReleases({ releases }: { releases: UIRelease[] }) {
 
   return (
     <section className="py-24 md:py-32 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid opacity-30" />
-      <div className="absolute top-0 left-0 w-96 h-96 rounded-full bg-deep-green/30 blur-[120px]" />
-      <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-gold/5 blur-[100px]" />
+      <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
+      <div className="absolute top-0 left-0 w-96 h-96 rounded-full bg-deep-green/30 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-72 h-72 rounded-full bg-gold/5 blur-[100px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
@@ -204,9 +213,15 @@ export function FeaturedReleases({ releases }: { releases: UIRelease[] }) {
                   {release.genre}
                 </span>
                 <div className="flex items-center gap-2">
-                  <a href={release.streaming.spotify} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white transition-colors">
-                    <ExternalLink size={13} />
-                  </a>
+                  {hasUrl(release.streaming.spotify) ? (
+                    <a href={release.streaming.spotify!} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white transition-colors">
+                      <ExternalLink size={13} />
+                    </a>
+                  ) : (
+                    <span className="text-white/10 cursor-not-allowed opacity-40">
+                      <ExternalLink size={13} />
+                    </span>
+                  )}
                   <button className="w-8 h-8 rounded-full glass flex items-center justify-center text-white/40 hover:text-white transition-colors">
                     <Play size={12} className="ml-0.5" />
                   </button>

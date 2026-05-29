@@ -25,6 +25,10 @@ export async function createArtist(data: {
   longBio: string
   color?: string
   image?: string
+  streams?: string
+  shows?: string
+  albums?: number
+  awards?: number
 }) {
   const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
   await prisma.artist.create({ data: { slug, ...data } })

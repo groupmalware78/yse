@@ -36,20 +36,17 @@ function ArtistCard({ artist, index }: { artist: UIArtist; index: number }) {
             />
             <div className="absolute inset-0 bg-grid opacity-40" />
 
-            {/* Artist image or initials — always inside the same circle */}
+            {/* Artist initials / silhouette */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div
-                className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center text-3xl font-black"
+                className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-black"
                 style={{
                   background: `radial-gradient(circle, ${accent}20 0%, transparent 70%)`,
                   border: `1px solid ${accent}30`,
                   color: accent,
                 }}
               >
-                {artist.image
-                  ? <img src={artist.image} alt={artist.name} className="w-full h-full object-cover" />
-                  : artist.name.split(' ').map(w => w[0]).join('').slice(0, 2)
-                }
+                {artist.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
               </div>
             </div>
 
@@ -138,8 +135,8 @@ export function FeaturedArtists({ artists }: { artists: UIArtist[] }) {
 
   return (
     <section className="py-24 md:py-32 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid-sm opacity-40" />
-      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-gold/5 blur-[120px]" />
+      <div className="absolute inset-0 bg-grid-sm opacity-40 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-gold/5 blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-5 md:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">

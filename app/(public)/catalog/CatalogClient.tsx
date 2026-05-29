@@ -13,6 +13,8 @@ const genreColors: Record<string, string> = {
   'Sound System': '#39ff14',
 }
 
+const hasUrl = (url: string | null | undefined) => !!url && url.trim() !== '' && url.trim() !== '#'
+
 const streamingPlatforms = [
   { name: 'Spotify', icon: '♫', color: '#1DB954' },
   { name: 'Apple Music', icon: '♪', color: '#FA243C' },
@@ -56,10 +58,14 @@ function AlbumGridCard({ release }: { release: UIRelease }) {
             { href: release.streaming.apple, label: '♪' },
             { href: release.streaming.youtube, label: '▶' },
             { href: release.streaming.tidal, label: '~' },
-          ].map((p, i) => (
-            <a key={i} href={p.href} target="_blank" rel="noopener noreferrer" className="flex-1 text-center py-2 glass rounded-lg text-xs text-white/40 hover:text-white transition-colors border border-transparent hover:border-white/10">
+          ].map((p, i) => hasUrl(p.href) ? (
+            <a key={i} href={p.href!} target="_blank" rel="noopener noreferrer" className="flex-1 text-center py-2 glass rounded-lg text-xs text-white/40 hover:text-white transition-colors border border-transparent hover:border-white/10">
               {p.label}
             </a>
+          ) : (
+            <span key={i} className="flex-1 text-center py-2 glass rounded-lg text-xs text-white/15 border border-transparent cursor-not-allowed opacity-40">
+              {p.label}
+            </span>
           ))}
         </div>
       </div>
@@ -87,8 +93,10 @@ function AlbumListRow({ release, index }: { release: UIRelease; index: number })
       </div>
       <span className="hidden lg:block text-white/30 text-xs">{release.tracks} tracks</span>
       <div className="flex items-center gap-2">
-        {[release.streaming.spotify, release.streaming.apple].map((href, i) => (
-          <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-white transition-colors"><ExternalLink size={13} /></a>
+        {[release.streaming.spotify, release.streaming.apple].map((href, i) => hasUrl(href) ? (
+          <a key={i} href={href!} target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-white transition-colors"><ExternalLink size={13} /></a>
+        ) : (
+          <span key={i} className="text-white/10 cursor-not-allowed opacity-40"><ExternalLink size={13} /></span>
         ))}
         <button className="w-8 h-8 rounded-full glass flex items-center justify-center text-white/40 hover:text-white transition-colors">
           <Play size={12} className="ml-0.5" />

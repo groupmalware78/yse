@@ -52,10 +52,10 @@ export async function getReleasesForUI() {
     tracks: r.tracks,
     label: r.label,
     streaming: {
-      spotify: r.spotifyUrl ?? '#',
-      apple: r.appleUrl ?? '#',
-      youtube: r.youtubeUrl ?? '#',
-      tidal: r.tidalUrl ?? '#',
+      spotify: r.spotifyUrl ?? null,
+      apple: r.appleUrl ?? null,
+      youtube: r.youtubeUrl ?? null,
+      tidal: r.tidalUrl ?? null,
     },
     featured: r.featured,
   }))

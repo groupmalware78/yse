@@ -31,9 +31,7 @@ function getBucket() {
 }
 
 export function getPublicUrl(key: string) {
-  const endpoint = process.env.AWS_ENDPOINT_URL
-  const bucket = process.env.AWS_S3_BUCKET_NAME
-  return `${endpoint}/${bucket}/${key}`
+  return `/api/audio?key=${encodeURIComponent(key)}`
 }
 
 export async function uploadToS3(buffer: Buffer, key: string, contentType: string) {

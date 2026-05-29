@@ -82,6 +82,22 @@ export async function getEventsForUI() {
 
 export type UIEvent = Awaited<ReturnType<typeof getEventsForUI>>[0]
 
+function toProxyAudioUrl(url: string): string {
+  // Already a proxy URL — leave as-is
+  if (url.startsWith('/api/audio')) return url
+  // Full S3 URL stored by earlier uploads — extract the key and proxy it
+  const endpoint = process.env.AWS_ENDPOINT_URL
+  const bucket = process.env.AWS_S3_BUCKET_NAME
+  if (endpoint && bucket) {
+    const prefix = `${endpoint}/${bucket}/`
+    if (url.startsWith(prefix)) {
+      const key = url.slice(prefix.length)
+      return `/api/audio?key=${encodeURIComponent(key)}`
+    }
+  }
+  return url
+}
+
 export async function getPlayerTracks() {
   const rows = await prisma.track.findMany({
     where: { featured: true, url: { not: null } },
@@ -92,7 +108,7 @@ export async function getPlayerTracks() {
     id: t.id,
     title: t.title,
     artist: t.artist.name,
-    url: t.url!,
+    url: toProxyAudioUrl(t.url!),
     duration: t.duration,
     album: t.album,
   }))

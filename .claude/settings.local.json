@@ -11,7 +11,13 @@
       "Bash(git push *)",
       "Bash(npx prisma *)",
       "Bash(npx tsc *)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE diff HEAD --stat)",
+      "Bash(osascript)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE status)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE show HEAD:components/home/SoundSystemTeaser.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE diff)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE log --oneline -5)"
     ]
   }
 }

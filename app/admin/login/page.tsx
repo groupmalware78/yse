@@ -128,11 +128,11 @@ function LoginForm() {
           </form>
 
           {/* Demo credentials hint */}
-          <div className="mt-6 p-4 rounded-xl bg-gold/5 border border-gold/15">
+          {/* <div className="mt-6 p-4 rounded-xl bg-gold/5 border border-gold/15">
             <p className="text-gold text-[10px] font-bold tracking-widest uppercase mb-2">Demo Credentials</p>
             <p className="text-white/40 text-xs font-mono">username: <span className="text-white">admin</span></p>
             <p className="text-white/40 text-xs font-mono">password: <span className="text-white">YardStyle2026!</span></p>
-          </div>
+          </div> */}
         </div>
 
         <p className="text-center text-white/15 text-xs mt-6">

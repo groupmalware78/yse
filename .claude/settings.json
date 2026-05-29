@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add app/admin/releases/ReleasesAdminClient.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE commit -m ' *)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE push origin main)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add components/home/FeaturedReleases.tsx app/\\\\\\(public\\\\\\)/catalog/CatalogClient.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add app/admin/artists/ArtistsAdminClient.tsx components/home/FeaturedArtists.tsx app/\\\\\\(public\\\\\\)/artists/ArtistsClient.tsx app/\\\\\\(public\\\\\\)/artists/\\\\[slug\\\\]/page.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add components/home/FeaturedArtists.tsx app/\\\\\\(public\\\\\\)/artists/ArtistsClient.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add components/admin/AdminSidebar.tsx app/admin/layout.tsx app/admin/settings/SettingsClient.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE checkout app/admin/layout.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE rm --cached components/admin/AdminShell.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add middleware.ts app/admin/layout.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add prisma/schema.prisma prisma/schema.dev.prisma lib/actions/tracks.ts lib/queries.ts app/admin/tracks/ components/admin/AdminSidebar.tsx app/\\\\\\(public\\\\\\)/layout.tsx components/layout/FloatingPlayer.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add lib/s3.ts app/api/upload/route.ts app/admin/tracks/TracksAdminClient.tsx package.json package-lock.json)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add lib/s3.ts)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add lib/s3.ts app/api/setup-bucket/route.ts components/layout/FloatingPlayer.tsx app/admin/tracks/TracksAdminClient.tsx)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add app/api/audio/route.ts lib/s3.ts lib/queries.ts)",
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add lib/s3.ts app/api/audio/route.ts app/api/setup-bucket app/admin/tracks/TracksAdminClient.tsx)"
+    ]
+  }
+}

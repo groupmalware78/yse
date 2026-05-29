@@ -92,14 +92,19 @@ export function ArtistsClient({ artists }: { artists: UIArtist[] }) {
                         <div className="absolute inset-0 bg-grid opacity-40" />
                         <div className="absolute top-0 left-1/3 w-px h-full" style={{ background: `linear-gradient(180deg, ${accent}40 0%, transparent 100%)`, filter: 'blur(4px)' }} />
                         <div className="absolute top-0 right-1/3 w-px h-full" style={{ background: `linear-gradient(180deg, ${accent}25 0%, transparent 100%)`, filter: 'blur(4px)' }} />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <motion.div whileHover={{ scale: 1.05 }} className="relative">
-                            <div className="w-28 h-28 rounded-full flex items-center justify-center font-black text-4xl"
-                              style={{ background: `radial-gradient(circle, ${accent}20 0%, transparent 70%)`, border: `2px solid ${accent}30`, color: accent }}>
-                              {initials}
+                        {artist.image
+                          ? <img src={artist.image} alt={artist.name} className="absolute inset-0 w-full h-full object-cover" />
+                          : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <motion.div whileHover={{ scale: 1.05 }} className="relative">
+                                <div className="w-28 h-28 rounded-full flex items-center justify-center font-black text-4xl"
+                                  style={{ background: `radial-gradient(circle, ${accent}20 0%, transparent 70%)`, border: `2px solid ${accent}30`, color: accent }}>
+                                  {initials}
+                                </div>
+                              </motion.div>
                             </div>
-                          </motion.div>
-                        </div>
+                          )
+                        }
                         <div className="absolute top-4 left-4">
                           <span className="text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full"
                             style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}30` }}>

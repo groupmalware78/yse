@@ -1,8 +1,8 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Search, Edit2, Trash2, ExternalLink, X, Save, Users } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, ExternalLink, X, Save, Camera, Trash } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { createArtist, updateArtist, deleteArtist } from '@/lib/actions/artists'
 import { useRouter } from 'next/navigation'
@@ -14,7 +14,7 @@ const genreColors: Record<string, string> = {
   'Reggae / Dub': '#d4af37', 'Afrobeats / Reggae': '#ff0077', 'DJ / Sound System': '#00ffcc',
 }
 
-type FormData = { name: string; genre: string; subGenre: string; origin: string; bio: string; longBio: string }
+type FormData = { name: string; genre: string; subGenre: string; origin: string; bio: string; longBio: string; image: string }
 
 function ArtistModal({ artist, onSave, onClose, saving }: {
   artist: Partial<UIArtist> | null
@@ -25,20 +25,58 @@ function ArtistModal({ artist, onSave, onClose, saving }: {
   const [form, setForm] = useState<FormData>({
     name: artist?.name ?? '', genre: artist?.genre ?? '', subGenre: artist?.subGenre ?? '',
     origin: artist?.origin ?? '', bio: artist?.bio ?? '', longBio: artist?.longBio ?? '',
+    image: artist?.image ?? '',
   })
   const update = (k: keyof FormData, v: string) => setForm(f => ({ ...f, [k]: v }))
+  const fileRef = useRef<HTMLInputElement>(null)
+  const initials = form.name ? form.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '?'
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => update('image', reader.result as string)
+    reader.readAsDataURL(file)
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-        className="relative glass rounded-2xl border border-white/10 w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-glass">
-        <div className="flex items-center justify-between p-6 border-b border-white/5">
+        className="relative glass rounded-2xl border border-white/10 w-full max-w-xl max-h-[90vh] flex flex-col shadow-glass">
+        <div className="flex items-center justify-between p-6 border-b border-white/5 flex-shrink-0">
           <h2 className="font-black text-lg">{artist?.name ? 'Edit Artist' : 'Add Artist'}</h2>
           <button onClick={onClose} className="text-white/40 hover:text-white transition-colors"><X size={18} /></button>
         </div>
-        <div className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="p-6 space-y-4 overflow-y-auto">
+          {/* Thumbnail upload */}
+          <div>
+            <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-3">Thumbnail Photo</label>
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center font-black text-xl border border-white/10"
+                style={form.image ? {} : { background: 'rgba(212,175,55,0.12)', color: '#d4af37' }}>
+                {form.image
+                  ? <img src={form.image} alt="preview" className="w-full h-full object-cover" />
+                  : initials}
+              </div>
+              <div className="flex flex-col gap-2">
+                <button type="button" onClick={() => fileRef.current?.click()}
+                  className="btn-glass px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-2">
+                  <Camera size={13} /> {form.image ? 'Change Photo' : 'Upload Photo'}
+                </button>
+                {form.image && (
+                  <button type="button" onClick={() => { update('image', ''); if (fileRef.current) fileRef.current.value = '' }}
+                    className="text-red-400/60 hover:text-red-400 text-xs font-bold inline-flex items-center gap-1.5 transition-colors">
+                    <Trash size={11} /> Remove
+                  </button>
+                )}
+                <p className="text-white/20 text-[10px]">JPG, PNG or WebP · max 2MB</p>
+              </div>
+            </div>
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFile} />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 pt-1 border-t border-white/5">
             <div className="col-span-2">
               <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Artist Name *</label>
               <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.name} onChange={e => update('name', e.target.value)} placeholder="Stage name" />
@@ -68,7 +106,7 @@ function ArtistModal({ artist, onSave, onClose, saving }: {
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-white/5">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-white/5 flex-shrink-0">
           <button onClick={onClose} className="btn-glass px-5 py-2.5 rounded-xl text-sm font-bold">Cancel</button>
           <button onClick={() => onSave(form)} disabled={!form.name || !form.genre || saving}
             className="btn-gold px-5 py-2.5 rounded-xl text-sm font-bold inline-flex items-center gap-2 disabled:opacity-40">
@@ -96,10 +134,11 @@ export function ArtistsAdminClient({ initialArtists }: { initialArtists: UIArtis
   const handleSave = (form: FormData) => {
     setSaving(true)
     startTransition(async () => {
+      const payload = { ...form, image: form.image || undefined }
       if (editing?.id) {
-        await updateArtist(editing.id, form)
+        await updateArtist(editing.id, payload)
       } else {
-        await createArtist(form)
+        await createArtist(payload)
       }
       router.refresh()
       setEditing(undefined)
@@ -154,8 +193,12 @@ export function ArtistsAdminClient({ initialArtists }: { initialArtists: UIArtis
                     className="border-b border-white/5 hover:bg-white/3 transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
-                          style={{ background: `${accent}18`, border: `1px solid ${accent}30`, color: accent }}>{initials}</div>
+                        <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center font-black text-sm flex-shrink-0"
+                          style={artist.image ? {} : { background: `${accent}18`, border: `1px solid ${accent}30`, color: accent }}>
+                          {artist.image
+                            ? <img src={artist.image} alt={artist.name} className="w-full h-full object-cover" />
+                            : initials}
+                        </div>
                         <div>
                           <p className="font-bold text-sm text-white">{artist.name}</p>
                           <p className="text-white/30 text-xs">{artist.subGenre}</p>

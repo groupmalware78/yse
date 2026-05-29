@@ -78,19 +78,26 @@ export default async function ArtistProfilePage({ params }: { params: { slug: st
               />
               {/* Artist circle */}
               <div
-                className="relative w-64 h-64 md:w-80 md:h-80 rounded-full flex items-center justify-center font-black text-7xl md:text-8xl border-2"
+                className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden flex items-center justify-center font-black text-7xl md:text-8xl border-2"
                 style={{
                   background: `radial-gradient(circle at 35% 35%, ${accent}25 0%, #111 50%, #060606 100%)`,
                   borderColor: `${accent}30`,
                   color: accent,
                 }}
               >
-                {initials}
-                {/* Inner rings */}
-                {[0.8, 0.6].map((s, i) => (
-                  <div key={i} className="absolute rounded-full border inset-0 m-auto"
-                    style={{ width: `${s * 100}%`, height: `${s * 100}%`, borderColor: `${accent}${i === 0 ? '12' : '08'}` }} />
-                ))}
+                {artist.image
+                  ? <img src={artist.image} alt={artist.name} className="absolute inset-0 w-full h-full object-cover" />
+                  : (
+                    <>
+                      {initials}
+                      {/* Inner rings */}
+                      {[0.8, 0.6].map((s, i) => (
+                        <div key={i} className="absolute rounded-full border inset-0 m-auto"
+                          style={{ width: `${s * 100}%`, height: `${s * 100}%`, borderColor: `${accent}${i === 0 ? '12' : '08'}` }} />
+                      ))}
+                    </>
+                  )
+                }
               </div>
 
               {/* Floating stat badges */}

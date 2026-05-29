@@ -36,19 +36,24 @@ function ArtistCard({ artist, index }: { artist: UIArtist; index: number }) {
             />
             <div className="absolute inset-0 bg-grid opacity-40" />
 
-            {/* Artist initials / silhouette */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div
-                className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-black"
-                style={{
-                  background: `radial-gradient(circle, ${accent}20 0%, transparent 70%)`,
-                  border: `1px solid ${accent}30`,
-                  color: accent,
-                }}
-              >
-                {artist.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
-              </div>
-            </div>
+            {/* Artist image or initials */}
+            {artist.image
+              ? <img src={artist.image} alt={artist.name} className="absolute inset-0 w-full h-full object-cover" />
+              : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div
+                    className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-black"
+                    style={{
+                      background: `radial-gradient(circle, ${accent}20 0%, transparent 70%)`,
+                      border: `1px solid ${accent}30`,
+                      color: accent,
+                    }}
+                  >
+                    {artist.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
+                  </div>
+                </div>
+              )
+            }
 
             {/* Hover overlay */}
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">

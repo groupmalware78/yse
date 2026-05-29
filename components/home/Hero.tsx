@@ -135,7 +135,7 @@ export function Hero() {
           className="flex items-center justify-center gap-3 mb-8"
         >
           <div className="w-16 h-px bg-gradient-to-r from-transparent to-gold/60" />
-          <span className="tag">Est. 2018 · Kingston, Jamaica</span>
+          <span className="tag">Est. 2015 · Portmore, Jamaica</span>
           <div className="w-16 h-px bg-gradient-to-l from-transparent to-gold/60" />
         </motion.div>
 

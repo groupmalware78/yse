@@ -1,20 +1,23 @@
 'use client'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
+import { useRef } from 'react'
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  // Store the pathname present on first render. useRef(value) only uses
+  // the argument on mount, so this is stable across re-renders and safe
+  // under React strict-mode's double-invoke.
+  const initialPath = useRef(pathname)
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.main
-        key={pathname}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -12 }}
-        transition={{ duration: 0.4, ease: 'easeInOut' }}
-      >
-        {children}
-      </motion.main>
-    </AnimatePresence>
+    <motion.main
+      key={pathname}
+      initial={pathname === initialPath.current ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
+      {children}
+    </motion.main>
   )
 }

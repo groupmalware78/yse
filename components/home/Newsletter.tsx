@@ -34,8 +34,8 @@ export function Newsletter() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left: newsletter */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ x: -30 }}
+            whileInView={{ x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
@@ -89,8 +89,8 @@ export function Newsletter() {
 
           {/* Right: social links */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ x: 30 }}
+            whileInView={{ x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.15 }}
           >
@@ -102,8 +102,8 @@ export function Newsletter() {
                 <motion.a
                   key={label}
                   href={href}
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ y: 15 }}
+                  whileInView={{ y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.1 + i * 0.08 }}
                   className="glass rounded-2xl p-5 flex items-center gap-4 card-hover border border-white/5 hover:border-gold/20 group"
@@ -125,10 +125,11 @@ export function Newsletter() {
               href="https://wa.me/18761234567"
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ y: 10 }}
+              whileInView={{ y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.5 }}
+              transformTemplate={({ y }) => `translateY(${y})`}
               className="mt-4 flex items-center gap-3 p-5 rounded-2xl card-hover border"
               style={{
                 background: 'rgba(37,211,102,0.06)',

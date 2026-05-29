@@ -93,8 +93,8 @@ export function SoundSystemTeaser() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Visual */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ x: -40 }}
+            whileInView={{ x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className="flex justify-center lg:justify-start"
@@ -141,11 +141,13 @@ export function SoundSystemTeaser() {
 
           {/* Content */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ x: 40 }}
+            whileInView={{ x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
+            transformTemplate={({ x }) => `translateX(${x})`}
           >
+         
             <p className="section-label mb-6">
               <Volume2 size={12} className="inline mr-1 text-gold" />
               Sound System

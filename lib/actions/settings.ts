@@ -4,12 +4,24 @@ import { compare, hash } from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { getSession } from './auth'
 
+const SETTINGS_DEFAULTS = {
+  id: 1,
+  siteName: 'YardStyle Entertainment',
+  tagline: 'Powering Music. Elevating Culture.',
+  contactEmail: 'info@yardstylement.com',
+  contactPhone: '+1 (876) 123-4567',
+  whatsapp: '+18761234567',
+  address: '13 Studio Lane, Kingston 6, Jamaica',
+  updatedAt: new Date(),
+}
+
 export async function getSettings() {
-  return prisma.siteSettings.upsert({
-    where: { id: 1 },
-    update: {},
-    create: { id: 1 },
-  })
+  try {
+    const settings = await prisma.siteSettings.findFirst({ where: { id: 1 } })
+    return settings ?? SETTINGS_DEFAULTS
+  } catch {
+    return SETTINGS_DEFAULTS
+  }
 }
 
 export async function saveSettings(data: {

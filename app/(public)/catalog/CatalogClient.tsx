@@ -57,7 +57,7 @@ function AlbumGridCard({ release }: { release: UIRelease }) {
             { href: release.streaming.youtube, label: '▶' },
             { href: release.streaming.tidal, label: '~' },
           ].map((p, i) => (
-            <a key={i} href={p.href} className="flex-1 text-center py-2 glass rounded-lg text-xs text-white/40 hover:text-white transition-colors border border-transparent hover:border-white/10">
+            <a key={i} href={p.href} target="_blank" rel="noopener noreferrer" className="flex-1 text-center py-2 glass rounded-lg text-xs text-white/40 hover:text-white transition-colors border border-transparent hover:border-white/10">
               {p.label}
             </a>
           ))}
@@ -88,7 +88,7 @@ function AlbumListRow({ release, index }: { release: UIRelease; index: number })
       <span className="hidden lg:block text-white/30 text-xs">{release.tracks} tracks</span>
       <div className="flex items-center gap-2">
         {[release.streaming.spotify, release.streaming.apple].map((href, i) => (
-          <a key={i} href={href} className="text-white/25 hover:text-white transition-colors"><ExternalLink size={13} /></a>
+          <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-white transition-colors"><ExternalLink size={13} /></a>
         ))}
         <button className="w-8 h-8 rounded-full glass flex items-center justify-center text-white/40 hover:text-white transition-colors">
           <Play size={12} className="ml-0.5" />

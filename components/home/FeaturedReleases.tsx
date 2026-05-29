@@ -109,6 +109,8 @@ function AlbumCard({ release, index }: { release: UIRelease; index: number }) {
               <a
                 key={s.label}
                 href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex-1 text-center py-1.5 glass rounded-lg text-[10px] font-semibold text-white/40 hover:text-white transition-colors border border-transparent hover:border-white/10"
               >
                 {s.label}
@@ -202,7 +204,7 @@ export function FeaturedReleases({ releases }: { releases: UIRelease[] }) {
                   {release.genre}
                 </span>
                 <div className="flex items-center gap-2">
-                  <a href={release.streaming.spotify} className="text-white/30 hover:text-white transition-colors">
+                  <a href={release.streaming.spotify} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white transition-colors">
                     <ExternalLink size={13} />
                   </a>
                   <button className="w-8 h-8 rounded-full glass flex items-center justify-center text-white/40 hover:text-white transition-colors">

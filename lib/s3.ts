@@ -1,12 +1,6 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  DeleteObjectCommand,
-  PutBucketCorsCommand,
-  PutBucketPolicyCommand,
-} from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3'
 
-function getClient() {
+export function getClient() {
   const endpoint = process.env.AWS_ENDPOINT_URL
   const accessKeyId = process.env.AWS_ACCESS_KEY_ID
   const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
@@ -21,10 +15,14 @@ function getClient() {
     region,
     credentials: { accessKeyId, secretAccessKey },
     forcePathStyle: true,
+    // Tigris (and many S3-compatible services) return 501 on checksum headers
+    // that the AWS SDK v3 adds by default. Disable them.
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED',
   })
 }
 
-function getBucket() {
+export function getBucket() {
   const bucket = process.env.AWS_S3_BUCKET_NAME
   if (!bucket) throw new Error('Missing S3 env var: AWS_S3_BUCKET_NAME')
   return bucket
@@ -35,54 +33,23 @@ export function getPublicUrl(key: string) {
 }
 
 export async function uploadToS3(buffer: Buffer, key: string, contentType: string) {
-  const client = getClient()
-  const bucket = getBucket()
-
-  await client.send(new PutObjectCommand({
-    Bucket: bucket,
+  await getClient().send(new PutObjectCommand({
+    Bucket: getBucket(),
     Key: key,
     Body: buffer,
     ContentType: contentType,
   }))
-
   return getPublicUrl(key)
 }
 
-export async function deleteFromS3(key: string) {
-  const client = getClient()
-  await client.send(new DeleteObjectCommand({ Bucket: getBucket(), Key: key }))
+export async function getFromS3(key: string, range?: string) {
+  return getClient().send(new GetObjectCommand({
+    Bucket: getBucket(),
+    Key: key,
+    Range: range,
+  }))
 }
 
-/** Call once from /api/setup-bucket to make the bucket publicly readable and CORS-enabled. */
-export async function configureBucket() {
-  const client = getClient()
-  const bucket = getBucket()
-
-  // Allow any origin to GET/HEAD objects (required for browser audio streaming)
-  await client.send(new PutBucketCorsCommand({
-    Bucket: bucket,
-    CORSConfiguration: {
-      CORSRules: [{
-        AllowedHeaders: ['*'],
-        AllowedMethods: ['GET', 'HEAD'],
-        AllowedOrigins: ['*'],
-        MaxAgeSeconds: 86400,
-      }],
-    },
-  }))
-
-  // Public-read bucket policy so objects are accessible without auth
-  await client.send(new PutBucketPolicyCommand({
-    Bucket: bucket,
-    Policy: JSON.stringify({
-      Version: '2012-10-17',
-      Statement: [{
-        Sid: 'PublicRead',
-        Effect: 'Allow',
-        Principal: '*',
-        Action: ['s3:GetObject'],
-        Resource: [`arn:aws:s3:::${bucket}/*`],
-      }],
-    }),
-  }))
+export async function deleteFromS3(key: string) {
+  await getClient().send(new DeleteObjectCommand({ Bucket: getBucket(), Key: key }))
 }

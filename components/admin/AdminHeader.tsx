@@ -1,6 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { ExternalLink, Bell } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ExternalLink, Bell, Calendar, Mail, X } from 'lucide-react'
+import { getNotifications } from '@/lib/actions/notifications'
 
 interface AdminHeaderProps {
   title: string
@@ -8,7 +10,36 @@ interface AdminHeaderProps {
   actions?: React.ReactNode
 }
 
+type Notifications = Awaited<ReturnType<typeof getNotifications>>
+
+function timeAgo(date: Date) {
+  const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
+  if (s < 60) return 'just now'
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`
+  return `${Math.floor(s / 86400)}d ago`
+}
+
 export function AdminHeader({ title, subtitle, actions }: AdminHeaderProps) {
+  const [open, setOpen] = useState(false)
+  const [data, setData] = useState<Notifications | null>(null)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    getNotifications().then(setData)
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const count = (data?.bookings.length ?? 0) + (data?.subscribers.length ?? 0)
+
   return (
     <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
       <div>
@@ -24,10 +55,77 @@ export function AdminHeader({ title, subtitle, actions }: AdminHeaderProps) {
         >
           <ExternalLink size={12} /> View Site
         </Link>
-        <button className="relative w-8 h-8 glass rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors border border-white/8">
-          <Bell size={14} />
-          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold text-black text-[9px] font-black flex items-center justify-center">3</span>
-        </button>
+
+        <div className="relative" ref={ref}>
+          <button
+            onClick={() => setOpen(v => !v)}
+            className="relative w-8 h-8 glass rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-colors border border-white/8"
+          >
+            <Bell size={14} />
+            {count > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold text-black text-[9px] font-black flex items-center justify-center">
+                {count > 9 ? '9+' : count}
+              </span>
+            )}
+          </button>
+
+          {open && (
+            <div className="absolute right-0 top-10 w-80 glass border border-white/10 rounded-2xl shadow-glass z-50 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                <span className="text-xs font-bold tracking-widest uppercase text-white/50">Notifications</span>
+                <button onClick={() => setOpen(false)} className="text-white/30 hover:text-white transition-colors"><X size={13} /></button>
+              </div>
+
+              {!data ? (
+                <div className="px-4 py-6 text-center text-white/30 text-xs">Loading…</div>
+              ) : count === 0 ? (
+                <div className="px-4 py-6 text-center text-white/30 text-xs">No new notifications</div>
+              ) : (
+                <div className="max-h-80 overflow-y-auto">
+                  {data.bookings.length > 0 && (
+                    <>
+                      <p className="px-4 pt-3 pb-1 text-[10px] font-bold tracking-widest uppercase text-white/25">Pending Bookings</p>
+                      {data.bookings.map(b => (
+                        <Link
+                          key={b.id}
+                          href="/admin/bookings"
+                          onClick={() => setOpen(false)}
+                          className="flex items-start gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-gold/15 border border-gold/25 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Calendar size={12} className="text-gold" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-white truncate">{b.name}</p>
+                            <p className="text-[10px] text-white/40 truncate">{b.service} · #{b.ref}</p>
+                            <p className="text-[10px] text-white/25 mt-0.5">{timeAgo(b.submittedAt)}</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </>
+                  )}
+
+                  {data.subscribers.length > 0 && (
+                    <>
+                      <p className="px-4 pt-3 pb-1 text-[10px] font-bold tracking-widest uppercase text-white/25">New Subscribers</p>
+                      {data.subscribers.map(s => (
+                        <div key={s.id} className="flex items-start gap-3 px-4 py-3">
+                          <div className="w-7 h-7 rounded-lg bg-deep-green/30 border border-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Mail size={12} className="text-white/50" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-white truncate">{s.email}</p>
+                            <p className="text-[10px] text-white/25 mt-0.5">{timeAgo(s.subscribedAt)}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

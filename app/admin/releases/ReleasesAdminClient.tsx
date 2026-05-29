@@ -14,7 +14,11 @@ const genreColors: Record<string, string> = {
   'Caribbean Fusion': '#ff0077', 'Dub / Reggae': '#39ff14', 'Sound System': '#39ff14',
 }
 
-type FormData = { title: string; artist: string; type: string; year: number; genre: string; tracks: number; featured: boolean }
+type FormData = {
+  title: string; artist: string; type: string; year: number; genre: string
+  tracks: number; featured: boolean
+  spotifyUrl: string; appleUrl: string; youtubeUrl: string; tidalUrl: string
+}
 
 function ReleaseModal({ release, artists, onSave, onClose, saving }: {
   release: Partial<UIRelease> | null
@@ -27,19 +31,30 @@ function ReleaseModal({ release, artists, onSave, onClose, saving }: {
     title: release?.title ?? '', artist: release?.artist ?? '', type: release?.type ?? 'Album',
     year: release?.year ?? new Date().getFullYear(), genre: release?.genre ?? '',
     tracks: release?.tracks ?? 1, featured: release?.featured ?? false,
+    spotifyUrl: release?.streaming?.spotify !== '#' ? (release?.streaming?.spotify ?? '') : '',
+    appleUrl:   release?.streaming?.apple   !== '#' ? (release?.streaming?.apple   ?? '') : '',
+    youtubeUrl: release?.streaming?.youtube !== '#' ? (release?.streaming?.youtube ?? '') : '',
+    tidalUrl:   release?.streaming?.tidal   !== '#' ? (release?.streaming?.tidal   ?? '') : '',
   })
   const update = (k: keyof FormData, v: string | number | boolean) => setForm(f => ({ ...f, [k]: v }))
+
+  const streamingFields: { key: keyof FormData; label: string; placeholder: string }[] = [
+    { key: 'spotifyUrl',  label: 'Spotify URL',     placeholder: 'https://open.spotify.com/album/...' },
+    { key: 'appleUrl',    label: 'Apple Music URL', placeholder: 'https://music.apple.com/...' },
+    { key: 'youtubeUrl',  label: 'YouTube URL',     placeholder: 'https://youtube.com/playlist/...' },
+    { key: 'tidalUrl',    label: 'Tidal URL',       placeholder: 'https://tidal.com/browse/album/...' },
+  ]
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
-        className="relative glass rounded-2xl border border-white/10 w-full max-w-lg shadow-glass">
-        <div className="flex items-center justify-between p-6 border-b border-white/5">
+        className="relative glass rounded-2xl border border-white/10 w-full max-w-lg shadow-glass max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b border-white/5 flex-shrink-0">
           <h2 className="font-black text-lg">{release?.title ? 'Edit Release' : 'Add Release'}</h2>
           <button onClick={onClose} className="text-white/40 hover:text-white"><X size={18} /></button>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 overflow-y-auto">
           <div>
             <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Title *</label>
             <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.title} onChange={e => update('title', e.target.value)} placeholder="Release title" />
@@ -80,8 +95,27 @@ function ReleaseModal({ release, artists, onSave, onClose, saving }: {
               </label>
             </div>
           </div>
+
+          {/* Streaming links */}
+          <div className="pt-2 border-t border-white/5">
+            <p className="text-[10px] font-bold tracking-widest uppercase text-white/35 mb-3">Streaming Links</p>
+            <div className="space-y-3">
+              {streamingFields.map(({ key, label, placeholder }) => (
+                <div key={key}>
+                  <label className="block text-[10px] font-bold tracking-widest uppercase text-white/25 mb-1.5">{label}</label>
+                  <input
+                    type="url"
+                    className="input-dark w-full px-4 py-3 rounded-xl text-sm"
+                    value={form[key] as string}
+                    onChange={e => update(key, e.target.value)}
+                    placeholder={placeholder}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-white/5">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-white/5 flex-shrink-0">
           <button onClick={onClose} className="btn-glass px-5 py-2.5 rounded-xl text-sm font-bold">Cancel</button>
           <button onClick={() => onSave(form)} disabled={!form.title || !form.artist || saving}
             className="btn-gold px-5 py-2.5 rounded-xl text-sm font-bold inline-flex items-center gap-2 disabled:opacity-40">
@@ -112,10 +146,18 @@ export function ReleasesAdminClient({ initialReleases, artists }: { initialRelea
     startTransition(async () => {
       const artist = artists.find(a => a.name === form.artist)
       const artistSlug = artist?.slug ?? form.artist.toLowerCase().replace(/\s+/g, '-')
+      const payload = {
+        ...form,
+        artistSlug,
+        spotifyUrl:  form.spotifyUrl  || undefined,
+        appleUrl:    form.appleUrl    || undefined,
+        youtubeUrl:  form.youtubeUrl  || undefined,
+        tidalUrl:    form.tidalUrl    || undefined,
+      }
       if (editing?.id) {
-        await updateRelease(editing.id, { ...form, artistSlug })
+        await updateRelease(editing.id, payload)
       } else {
-        await createRelease({ ...form, artistSlug })
+        await createRelease(payload)
       }
       router.refresh()
       setEditing(undefined)

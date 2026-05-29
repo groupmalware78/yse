@@ -24,6 +24,15 @@ export async function POST(req: Request) {
 
   const toEmail = process.env.CONTACT_TO_EMAIL ?? 'info@yardstylement.com'
 
+  const audienceId = process.env.RESEND_AUDIENCE_ID
+  if (audienceId) {
+    try {
+      await resend.contacts.create({ audienceId, email, unsubscribed: false })
+    } catch (err) {
+      console.error('[newsletter] resend audience sync error:', err)
+    }
+  }
+
   try {
     await Promise.all([
       resend.emails.send({

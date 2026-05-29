@@ -1,7 +1,7 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Search, Edit2, Trash2, X, Save, Music, Radio } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, X, Save, Music, Radio, Upload, CheckCircle, Loader2 } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { createTrack, updateTrack, deleteTrack } from '@/lib/actions/tracks'
 import { useRouter } from 'next/navigation'
@@ -17,6 +17,77 @@ type Track = {
 type FormData = {
   title: string; album: string; duration: string
   artistId: number; url: string; featured: boolean
+}
+
+type UploadState = 'idle' | 'uploading' | 'done' | 'error'
+
+function Mp3Uploader({ url, onChange }: { url: string; onChange: (url: string) => void }) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [uploadState, setUploadState] = useState<UploadState>('idle')
+  const [fileName, setFileName] = useState('')
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setFileName(file.name)
+    setUploadState('uploading')
+    try {
+      const body = new FormData()
+      body.append('file', file)
+      body.append('folder', 'tracks')
+      const res = await fetch('/api/upload', { method: 'POST', body })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error ?? 'Upload failed')
+      }
+      const { url: uploaded } = await res.json()
+      onChange(uploaded)
+      setUploadState('done')
+    } catch (err) {
+      console.error(err)
+      setUploadState('error')
+    }
+  }
+
+  return (
+    <div>
+      <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Audio File *</label>
+
+      {/* Upload button row */}
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={() => fileRef.current?.click()}
+          className="btn-glass px-4 py-2.5 rounded-xl text-xs font-bold inline-flex items-center gap-2 flex-shrink-0">
+          {uploadState === 'uploading'
+            ? <><Loader2 size={13} className="animate-spin" /> Uploading…</>
+            : <><Upload size={13} /> {url ? 'Replace File' : 'Upload MP3'}</>
+          }
+        </button>
+        {uploadState === 'done' && (
+          <span className="flex items-center gap-1.5 text-green-400 text-xs font-semibold">
+            <CheckCircle size={13} /> Uploaded
+          </span>
+        )}
+        {uploadState === 'error' && (
+          <span className="text-red-400 text-xs">Upload failed — try again</span>
+        )}
+        {uploadState === 'idle' && fileName && (
+          <span className="text-white/30 text-xs truncate">{fileName}</span>
+        )}
+      </div>
+
+      {/* Existing / uploaded URL display */}
+      {url && (
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-white/20 text-[10px] truncate flex-1">{url}</span>
+          <audio src={url} controls className="h-7 w-48 flex-shrink-0" />
+        </div>
+      )}
+
+      {/* Hidden file input */}
+      <input ref={fileRef} type="file" accept=".mp3,.wav,.ogg,.aac,audio/*"
+        className="hidden" onChange={handleFile} />
+    </div>
+  )
 }
 
 function TrackModal({ track, artists, onSave, onClose, saving }: {
@@ -71,12 +142,9 @@ function TrackModal({ track, artists, onSave, onClose, saving }: {
                 onChange={e => update('duration', e.target.value)} placeholder="3:42" />
             </div>
           </div>
-          <div>
-            <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">MP3 URL *</label>
-            <input type="url" className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.url}
-              onChange={e => update('url', e.target.value)} placeholder="https://cdn.example.com/track.mp3" />
-            <p className="text-white/20 text-[10px] mt-1.5">Direct link to a publicly hosted MP3 file</p>
-          </div>
+
+          <Mp3Uploader url={form.url} onChange={url => update('url', url)} />
+
           <div>
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={form.featured} onChange={e => update('featured', e.target.checked)}

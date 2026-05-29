@@ -19,12 +19,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  const toEmail = process.env.CONTACT_TO_EMAIL ?? 'info@yardstylement.com'
+  const toEmail = process.env.CONTACT_TO_EMAIL ?? 'ysejam@gmail.com'
   const deptLabel = DEPT_LABELS[department] ?? department
 
   try {
     await resend.emails.send({
-      from: 'YardStyle Entertainment <ysejam@gmail.com>',
+      from: 'YardStyle Entertainment <noreply@yseja.com>',
       to: toEmail,
       replyTo: email,
       subject: `[${deptLabel}] New inquiry from ${name}`,
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     })
 
     await resend.emails.send({
-      from: 'YardStyle Entertainment <ysejam@gmail.com>',
+      from: 'YardStyle Entertainment <noreply@yseja.com>',
       to: email,
       subject: "We received your message — YardStyle Entertainment",
       html: `

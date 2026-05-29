@@ -13,12 +13,28 @@ const socials = [
 export function Newsletter() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
-    setSubmitted(true)
-    setEmail('')
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (!res.ok) throw new Error('Failed')
+      setSubmitted(true)
+      setEmail('')
+    } catch {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -38,6 +54,7 @@ export function Newsletter() {
             whileInView={{ x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            transformTemplate={({ x }) => `translateX(${x})`}
           >
             <p className="section-label mb-6">Stay Connected</p>
             <h2 className="text-4xl md:text-5xl font-black leading-tight mb-4">
@@ -61,25 +78,30 @@ export function Newsletter() {
                 <p className="text-white/50 text-sm">You're now on the list. Expect fire in your inbox.</p>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1 relative">
-                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
-                    className="input-dark w-full pl-12 pr-4 py-4 rounded-full text-sm"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="btn-gold px-7 py-4 rounded-full text-sm font-bold tracking-widest uppercase inline-flex items-center gap-2 whitespace-nowrap"
-                >
-                  Subscribe <ArrowRight size={15} />
-                </button>
-              </form>
+              <>
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1 relative">
+                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      placeholder="Enter your email address"
+                      className="input-dark w-full pl-12 pr-4 py-4 rounded-full text-sm"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn-gold px-7 py-4 rounded-full text-sm font-bold tracking-widest uppercase inline-flex items-center gap-2 whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {loading ? 'Subscribing…' : <><span>Subscribe</span><ArrowRight size={15} /></>}
+                  </button>
+                </form>
+                {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
+              </>
             )}
 
             <p className="text-white/20 text-xs mt-4">

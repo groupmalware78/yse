@@ -143,6 +143,12 @@ model AdminUser {
   updatedAt    DateTime @updatedAt
 }
 
+model NewsletterSubscriber {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  subscribedAt DateTime @default(now())
+}
+
 model SiteSettings {
   id           Int      @id @default(1)
   siteName     String   @default("YardStyle Entertainment")

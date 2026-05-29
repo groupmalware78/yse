@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, Disc, Calendar, BookOpen,
   Volume2, LogOut, Settings, ChevronRight, Menu, X
 } from 'lucide-react'
-import { logout, getAdminInfo } from '@/lib/adminAuth'
+import { logout } from '@/lib/actions/auth'
 import { useState } from 'react'
 
 const navItems = [
@@ -45,10 +45,9 @@ function NavItem({ item, collapsed }: { item: typeof navItems[0]; collapsed: boo
   )
 }
 
-export function AdminSidebar() {
+export function AdminSidebar({ admin }: { admin: { name: string; role: string } | null }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const admin = getAdminInfo()
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -91,13 +90,15 @@ export function AdminSidebar() {
             </div>
           </div>
         )}
-        <button
-          onClick={logout}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/40 hover:text-red-400 hover:bg-red-400/8 transition-all duration-200 border border-transparent ${collapsed ? 'justify-center' : ''}`}
-        >
-          <LogOut size={16} className="flex-shrink-0" />
-          {!collapsed && <span>Log Out</span>}
-        </button>
+        <form action={logout}>
+          <button
+            type="submit"
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/40 hover:text-red-400 hover:bg-red-400/8 transition-all duration-200 border border-transparent ${collapsed ? 'justify-center' : ''}`}
+          >
+            <LogOut size={16} className="flex-shrink-0" />
+            {!collapsed && <span>Log Out</span>}
+          </button>
+        </form>
       </div>
     </div>
   )

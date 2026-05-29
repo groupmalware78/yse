@@ -181,13 +181,14 @@ export function SettingsClient({ settings }: Props) {
               </div>
 
               <div className="pt-2 border-t border-white/5">
-                <button
-                  type="button"
-                  onClick={() => logout()}
-                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-red-400 bg-red-400/8 border border-red-400/15 hover:bg-red-400/15 transition-colors"
-                >
-                  Sign Out of All Sessions
-                </button>
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="px-4 py-2.5 rounded-xl text-sm font-bold text-red-400 bg-red-400/8 border border-red-400/15 hover:bg-red-400/15 transition-colors"
+                  >
+                    Sign Out of All Sessions
+                  </button>
+                </form>
               </div>
             </div>
           </motion.div>

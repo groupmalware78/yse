@@ -30,6 +30,8 @@ interface Props {
 
 export function ContactClient({ settings }: Props) {
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({ name: '', email: '', phone: '', department: '', message: '' })
   const update = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
@@ -75,7 +77,24 @@ export function ContactClient({ settings }: Props) {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                 className="glass rounded-3xl p-8 border border-white/5">
                 <h2 className="font-black text-xl mb-6">Send us a message</h2>
-                <form onSubmit={e => { e.preventDefault(); setSubmitted(true) }} className="space-y-5">
+                <form onSubmit={async e => {
+                  e.preventDefault()
+                  setLoading(true)
+                  setError(null)
+                  try {
+                    const res = await fetch('/api/contact', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(form),
+                    })
+                    if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to send')
+                    setSubmitted(true)
+                  } catch (err) {
+                    setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+                  } finally {
+                    setLoading(false)
+                  }
+                }} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-xs font-bold tracking-widest uppercase text-white/35 mb-2">Full Name *</label>
@@ -103,8 +122,11 @@ export function ContactClient({ settings }: Props) {
                     <label className="block text-xs font-bold tracking-widest uppercase text-white/35 mb-2">Message *</label>
                     <textarea rows={6} className="input-dark w-full px-4 py-3.5 rounded-xl text-sm resize-none" placeholder="Tell us about your inquiry..." value={form.message} onChange={e => update('message', e.target.value)} required />
                   </div>
-                  <button type="submit" className="btn-gold w-full py-4 rounded-xl text-sm font-bold tracking-widest uppercase inline-flex items-center justify-center gap-2">
-                    Send Message <Send size={15} />
+                  {error && (
+                    <p className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 rounded-xl py-3 px-4">{error}</p>
+                  )}
+                  <button type="submit" disabled={loading} className="btn-gold w-full py-4 rounded-xl text-sm font-bold tracking-widest uppercase inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                    {loading ? 'Sending…' : <><span>Send Message</span><Send size={15} /></>}
                   </button>
                 </form>
               </motion.div>

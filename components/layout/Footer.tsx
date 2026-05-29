@@ -62,7 +62,7 @@ export function Footer({ settings }: { settings: FooterSettings }) {
               </div>
             </Link>
             <p className="text-white/40 text-sm leading-relaxed mb-8 max-w-xs">
-              Jamaica's premier music record label and sound system. Powering the culture from Kingston to the world.
+              Jamaica's premier music record label and sound system. Powering the culture from Portmore to the world.
             </p>
             <div className="flex items-center gap-3">
               {socials.map(({ icon: Icon, href, label }) => (

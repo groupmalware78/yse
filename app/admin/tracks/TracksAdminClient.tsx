@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition, useRef } from 'react'
+import { useState, useEffect, useTransition, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Search, Edit2, Trash2, X, Save, Music, Radio, Upload, CheckCircle, Loader2 } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -167,6 +167,7 @@ function TrackModal({ track, artists, onSave, onClose, saving }: {
 
 export function TracksAdminClient({ initialTracks, artists }: { initialTracks: Track[]; artists: UIArtist[] }) {
   const [tracks, setTracks] = useState<Track[]>(initialTracks)
+  useEffect(() => { setTracks(initialTracks) }, [initialTracks])
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState<Partial<Track> | null | undefined>(undefined)
   const [saving, setSaving] = useState(false)

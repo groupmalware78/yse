@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Edit2, Trash2, X, Save, Volume2, Star } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -80,6 +80,7 @@ function PackageModal({ pkg, onSave, onClose, saving }: {
 
 export function SoundSystemAdminClient({ initialPackages }: { initialPackages: Package[] }) {
   const [packages, setPackages] = useState<Package[]>(initialPackages)
+  useEffect(() => { setPackages(initialPackages) }, [initialPackages])
   const [editing, setEditing] = useState<Partial<Package> | null | undefined>(undefined)
   const [saving, setSaving] = useState(false)
   const [, startTransition] = useTransition()

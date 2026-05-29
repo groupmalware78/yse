@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Trash2, CheckCircle, XCircle, ChevronDown, ChevronUp } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -174,6 +174,7 @@ function BookingRow({ booking, onStatusChange, onDelete }: {
 
 export function BookingsClient({ initialBookings }: { initialBookings: Booking[] }) {
   const [bookings, setBookings] = useState<Booking[]>(initialBookings)
+  useEffect(() => { setBookings(initialBookings) }, [initialBookings])
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<BookingStatus | 'all'>('all')
   const [, startTransition] = useTransition()

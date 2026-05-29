@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Search, Edit2, Trash2, X, Save } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -129,6 +129,7 @@ function ReleaseModal({ release, artists, onSave, onClose, saving }: {
 
 export function ReleasesAdminClient({ initialReleases, artists }: { initialReleases: UIRelease[]; artists: UIArtist[] }) {
   const [releases, setReleases] = useState<UIRelease[]>(initialReleases)
+  useEffect(() => { setReleases(initialReleases) }, [initialReleases])
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState<Partial<UIRelease> | null | undefined>(undefined)
   const [saving, setSaving] = useState(false)

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Search, Edit2, Trash2, X, Save, MapPin, Calendar } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
@@ -91,6 +91,7 @@ function EventModal({ event, onSave, onClose, saving }: {
 
 export function EventsAdminClient({ initialEvents }: { initialEvents: UIEvent[] }) {
   const [events, setEvents] = useState<UIEvent[]>(initialEvents)
+  useEffect(() => { setEvents(initialEvents) }, [initialEvents])
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState<Partial<UIEvent> | null | undefined>(undefined)
   const [saving, setSaving] = useState(false)

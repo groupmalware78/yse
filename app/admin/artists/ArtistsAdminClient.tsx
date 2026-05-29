@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition, useRef } from 'react'
+import { useState, useEffect, useTransition, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Search, Edit2, Trash2, ExternalLink, X, Save, Camera, Trash } from 'lucide-react'
@@ -120,6 +120,7 @@ function ArtistModal({ artist, onSave, onClose, saving }: {
 
 export function ArtistsAdminClient({ initialArtists }: { initialArtists: UIArtist[] }) {
   const [artists, setArtists] = useState<UIArtist[]>(initialArtists)
+  useEffect(() => { setArtists(initialArtists) }, [initialArtists])
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState<Partial<UIArtist> | null | undefined>(undefined)
   const [saving, setSaving] = useState(false)

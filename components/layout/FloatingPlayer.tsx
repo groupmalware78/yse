@@ -75,6 +75,7 @@ export function FloatingPlayer({ tracks }: { tracks: PlayerTrack[] }) {
     <>
       <audio
         ref={audioRef}
+        crossOrigin="anonymous"
         onTimeUpdate={e => setCurrentTime(e.currentTarget.currentTime)}
         onDurationChange={e => setDuration(e.currentTarget.duration)}
         onEnded={next}

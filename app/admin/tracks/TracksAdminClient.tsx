@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Search, Edit2, Trash2, X, Save, Music, Radio, Upload, CheckCircle, Loader2 } from 'lucide-react'
+import { Plus, Search, Edit2, Trash2, X, Save, Music, Radio, Upload, CheckCircle, Loader2, Settings2 } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { createTrack, updateTrack, deleteTrack } from '@/lib/actions/tracks'
 import { useRouter } from 'next/navigation'
@@ -170,8 +170,19 @@ export function TracksAdminClient({ initialTracks, artists }: { initialTracks: T
   const [search, setSearch] = useState('')
   const [editing, setEditing] = useState<Partial<Track> | null | undefined>(undefined)
   const [saving, setSaving] = useState(false)
+  const [bucketSetup, setBucketSetup] = useState<'idle' | 'running' | 'done' | 'error'>('idle')
   const [, startTransition] = useTransition()
   const router = useRouter()
+
+  const handleSetupBucket = async () => {
+    setBucketSetup('running')
+    try {
+      const res = await fetch('/api/setup-bucket', { method: 'POST' })
+      setBucketSetup(res.ok ? 'done' : 'error')
+    } catch {
+      setBucketSetup('error')
+    }
+  }
 
   const filtered = tracks.filter(t =>
     t.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -215,10 +226,22 @@ export function TracksAdminClient({ initialTracks, artists }: { initialTracks: T
         title="Tracks"
         subtitle={`${tracks.length} tracks · ${inPlayer} in floating player`}
         actions={
-          <button onClick={() => setEditing({})}
-            className="btn-gold px-4 py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase inline-flex items-center gap-2">
-            <Plus size={14} /> Add Track
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={handleSetupBucket} disabled={bucketSetup === 'running'}
+              title="Configure bucket CORS + public-read (run once after creating the bucket)"
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold inline-flex items-center gap-2 border transition-colors ${
+                bucketSetup === 'done' ? 'text-green-400 border-green-400/20 bg-green-400/8'
+                : bucketSetup === 'error' ? 'text-red-400 border-red-400/20 bg-red-400/8'
+                : 'btn-glass border-white/10'
+              }`}>
+              {bucketSetup === 'running' ? <Loader2 size={13} className="animate-spin" /> : <Settings2 size={13} />}
+              {bucketSetup === 'done' ? 'Bucket Ready' : bucketSetup === 'error' ? 'Setup Failed' : 'Setup Bucket'}
+            </button>
+            <button onClick={() => setEditing({})}
+              className="btn-gold px-4 py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase inline-flex items-center gap-2">
+              <Plus size={14} /> Add Track
+            </button>
+          </div>
         }
       />
 

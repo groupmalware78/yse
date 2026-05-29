@@ -24,19 +24,16 @@ export async function POST(req: Request) {
 
   const toEmail = process.env.CONTACT_TO_EMAIL ?? 'info@yardstylement.com'
 
-  const audienceId = process.env.RESEND_AUDIENCE_ID
-  if (audienceId) {
-    try {
-      await resend.contacts.create({ audienceId, email, unsubscribed: false })
-    } catch (err) {
-      console.error('[newsletter] resend audience sync error:', err)
-    }
+  try {
+    await resend.contacts.create({ email, unsubscribed: false })
+  } catch (err) {
+    console.error('[newsletter] resend contact sync error:', err)
   }
 
   try {
     await Promise.all([
       resend.emails.send({
-        from: 'YardStyle Entertainment <ysejam@gmail.com>',
+        from: 'YardStyle Entertainment <noreply@yseja.com>',
         to: email,
         subject: "Welcome to the YardStyle fam 🔥",
         html: `
@@ -56,7 +53,7 @@ export async function POST(req: Request) {
         `,
       }),
       resend.emails.send({
-        from: 'YardStyle Entertainment <ysejam@gmail.com>',
+        from: 'YardStyle Entertainment <noreply@yseja.com>',
         to: toEmail,
         subject: `New newsletter subscriber: ${email}`,
         html: `<p style="font-family:sans-serif"><strong>${email}</strong> just subscribed to the newsletter.</p>`,

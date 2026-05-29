@@ -23,14 +23,20 @@ function timeAgo(date: Date) {
 export function AdminHeader({ title, subtitle, actions }: AdminHeaderProps) {
   const [open, setOpen] = useState(false)
   const [data, setData] = useState<Notifications | null>(null)
+  const [lastSeen, setLastSeen] = useState<number>(0)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const stored = localStorage.getItem('notif_last_seen')
+    if (stored) setLastSeen(Number(stored))
     getNotifications().then(setData)
   }, [])
 
   useEffect(() => {
     if (!open) return
+    const now = Date.now()
+    localStorage.setItem('notif_last_seen', String(now))
+    setLastSeen(now)
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
@@ -38,7 +44,11 @@ export function AdminHeader({ title, subtitle, actions }: AdminHeaderProps) {
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
-  const count = (data?.bookings.length ?? 0) + (data?.subscribers.length ?? 0)
+  const isNew = (date: Date) => new Date(date).getTime() > lastSeen
+  const count = [
+    ...(data?.bookings.map(b => b.submittedAt) ?? []),
+    ...(data?.subscribers.map(s => s.subscribedAt) ?? []),
+  ].filter(isNew).length
 
   return (
     <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">

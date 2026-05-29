@@ -1,8 +1,8 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 
-const SESSION_COOKIE = 'yse_session'
-const SESSION_MAX_AGE = 8 * 60 * 60 // 8 hours
+export const SESSION_COOKIE = 'yse_session'
+export const SESSION_MAX_AGE = 15 * 60 // 15 minutes in seconds
 
 function getSecret() {
   const secret = process.env.AUTH_SECRET
@@ -17,21 +17,28 @@ export interface SessionPayload {
   role: string
 }
 
-export async function createSession(payload: SessionPayload) {
-  const token = await new SignJWT(payload as unknown as Record<string, unknown>)
+export function cookieOptions(maxAge = SESSION_MAX_AGE) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+    maxAge,
+    path: '/',
+  }
+}
+
+export async function signToken(payload: SessionPayload): Promise<string> {
+  return new SignJWT(payload as unknown as Record<string, unknown>)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_MAX_AGE}s`)
     .sign(getSecret())
+}
 
+export async function createSession(payload: SessionPayload) {
+  const token = await signToken(payload)
   const cookieStore = await cookies()
-  cookieStore.set(SESSION_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: SESSION_MAX_AGE,
-    path: '/',
-  })
+  cookieStore.set(SESSION_COOKIE, token, cookieOptions())
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
@@ -51,15 +58,13 @@ export async function destroySession() {
   cookieStore.delete(SESSION_COOKIE)
 }
 
-export function getSessionToken(cookieHeader: string): string | null {
-  const match = cookieHeader.match(new RegExp(`(?:^|; )${SESSION_COOKIE}=([^;]+)`))
-  return match?.[1] ?? null
-}
-
-export async function verifyToken(token: string): Promise<SessionPayload | null> {
+// Used by middleware — verifies the token and issues a fresh one for sliding expiration
+export async function verifyAndRefresh(token: string): Promise<{ payload: SessionPayload; newToken: string } | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret())
-    return payload as unknown as SessionPayload
+    const sessionPayload = payload as unknown as SessionPayload
+    const newToken = await signToken(sessionPayload)
+    return { payload: sessionPayload, newToken }
   } catch {
     return null
   }

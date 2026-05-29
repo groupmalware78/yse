@@ -82,6 +82,24 @@ export async function getEventsForUI() {
 
 export type UIEvent = Awaited<ReturnType<typeof getEventsForUI>>[0]
 
+export async function getPlayerTracks() {
+  const rows = await prisma.track.findMany({
+    where: { featured: true, url: { not: null } },
+    include: { artist: { select: { name: true } } },
+    orderBy: { id: 'asc' },
+  })
+  return rows.map(t => ({
+    id: t.id,
+    title: t.title,
+    artist: t.artist.name,
+    url: t.url!,
+    duration: t.duration,
+    album: t.album,
+  }))
+}
+
+export type PlayerTrack = Awaited<ReturnType<typeof getPlayerTracks>>[0]
+
 export async function getSoundPackagesForUI() {
   const rows = await prisma.soundPackage.findMany({ orderBy: { id: 'asc' } })
   return rows.map(p => ({

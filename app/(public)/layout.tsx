@@ -6,9 +6,10 @@ import { FloatingPlayer } from '@/components/layout/FloatingPlayer'
 import { CustomCursor } from '@/components/ui/CustomCursor'
 import { PageTransition } from '@/components/layout/PageTransition'
 import { getSettings } from '@/lib/actions/settings'
+import { getPlayerTracks } from '@/lib/queries'
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  const settings = await getSettings()
+  const [settings, tracks] = await Promise.all([getSettings(), getPlayerTracks()])
 
   return (
     <>
@@ -16,7 +17,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <Navbar />
       <PageTransition>{children}</PageTransition>
       <Footer settings={settings} />
-      <FloatingPlayer />
+      <FloatingPlayer tracks={tracks} />
     </>
   )
 }

@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard, Users, Disc, Calendar, BookOpen,
-  Volume2, LogOut, Settings, ChevronRight, Menu, X
+  Volume2, LogOut, Settings, ChevronRight, Menu, X, Music
 } from 'lucide-react'
 import { logout } from '@/lib/actions/auth'
 import { useState } from 'react'
@@ -13,6 +13,7 @@ const navItems = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/admin/bookings', icon: BookOpen, label: 'Bookings', badge: true },
   { href: '/admin/artists', icon: Users, label: 'Artists' },
+  { href: '/admin/tracks', icon: Music, label: 'Tracks' },
   { href: '/admin/releases', icon: Disc, label: 'Releases' },
   { href: '/admin/events', icon: Calendar, label: 'Events' },
   { href: '/admin/sound-system', icon: Volume2, label: 'Sound System' },

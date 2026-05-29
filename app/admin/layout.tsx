@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { getSession } from '@/lib/actions/auth'
 
@@ -8,6 +9,12 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = (await headers()).get('x-pathname') ?? ''
+
+  if (pathname === '/admin/login') {
+    return <>{children}</>
+  }
+
   const session = await getSession()
   const admin = session ? { name: session.name, role: session.role } : null
 

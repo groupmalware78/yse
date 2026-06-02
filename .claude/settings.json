@@ -16,7 +16,11 @@
       "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add lib/s3.ts)",
       "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add lib/s3.ts app/api/setup-bucket/route.ts components/layout/FloatingPlayer.tsx app/admin/tracks/TracksAdminClient.tsx)",
       "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add app/api/audio/route.ts lib/s3.ts lib/queries.ts)",
-      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add lib/s3.ts app/api/audio/route.ts app/api/setup-bucket app/admin/tracks/TracksAdminClient.tsx)"
+      "Bash(git -C /Users/deevexx/Downloads/Projects/YSE add lib/s3.ts app/api/audio/route.ts app/api/setup-bucket app/admin/tracks/TracksAdminClient.tsx)",
+      "Bash(mkdir -p \"/Users/deevexx/Downloads/Projects/YSE/app/\\(public\\)/live\")"
+    ],
+    "additionalDirectories": [
+      "/Users/deevexx/Downloads/Projects/YSE/app/(public)"
     ]
   }
 }

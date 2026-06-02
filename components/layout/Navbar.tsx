@@ -10,6 +10,7 @@ const navLinks = [
   { href: '/artists', label: 'Artists' },
   { href: '/catalog', label: 'Catalog' },
   { href: '/sound-system', label: 'Sound System' },
+  { href: '/live', label: 'Live' },
   { href: '/contact', label: 'Contact' },
 ]
 
@@ -85,10 +86,10 @@ export function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-2">
+            <Link href="/live" className="hidden lg:flex items-center gap-2 hover:opacity-80 transition-opacity">
               <EqAnimation />
               <span className="text-gold text-xs font-semibold tracking-widest uppercase">Live</span>
-            </div>
+            </Link>
             <Link
               href="/booking"
               className="hidden md:inline-flex items-center btn-gold px-5 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase"

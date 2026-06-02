@@ -12,6 +12,8 @@ const SETTINGS_DEFAULTS = {
   contactPhone: '+1 (876) 123-4567',
   whatsapp: '+18761234567',
   address: '13 Studio Lane, Kingston 6, Jamaica',
+  tiktokLiveUrl: null as string | null,
+  livePageEnabled: true,
   updatedAt: new Date(),
 }
 
@@ -31,6 +33,8 @@ export async function saveSettings(data: {
   contactPhone: string
   whatsapp: string
   address: string
+  tiktokLiveUrl?: string | null
+  livePageEnabled?: boolean
 }) {
   await prisma.siteSettings.upsert({
     where: { id: 1 },
@@ -38,6 +42,7 @@ export async function saveSettings(data: {
     create: { id: 1, ...data },
   })
   revalidatePath('/contact')
+  revalidatePath('/live')
   revalidatePath('/admin/settings')
 }
 

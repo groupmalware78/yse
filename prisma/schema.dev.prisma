@@ -150,12 +150,14 @@ model NewsletterSubscriber {
 }
 
 model SiteSettings {
-  id           Int      @id @default(1)
-  siteName     String   @default("YardStyle Entertainment")
-  tagline      String   @default("Powering Music. Elevating Culture.")
-  contactEmail String   @default("info@yardstylement.com")
-  contactPhone String   @default("+1 (876) 123-4567")
-  whatsapp     String   @default("+18761234567")
-  address      String   @default("13 Studio Lane, Kingston 6, Jamaica")
-  updatedAt    DateTime @updatedAt
+  id             Int      @id @default(1)
+  siteName       String   @default("YardStyle Entertainment")
+  tagline        String   @default("Powering Music. Elevating Culture.")
+  contactEmail   String   @default("info@yardstylement.com")
+  contactPhone   String   @default("+1 (876) 123-4567")
+  whatsapp       String   @default("+18761234567")
+  address        String   @default("13 Studio Lane, Kingston 6, Jamaica")
+  tiktokLiveUrl   String?
+  livePageEnabled Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
 }

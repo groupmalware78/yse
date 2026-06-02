@@ -14,6 +14,8 @@ interface Props {
     contactPhone: string
     whatsapp: string
     address: string
+    tiktokLiveUrl?: string | null
+    livePageEnabled?: boolean | null
   }
 }
 
@@ -32,10 +34,12 @@ export function SettingsClient({ settings }: Props) {
     contactPhone: settings.contactPhone,
     whatsapp: settings.whatsapp,
     address: settings.address,
+    tiktokLiveUrl: settings.tiktokLiveUrl ?? '',
+    livePageEnabled: settings.livePageEnabled ?? true,
   })
 
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
-  const update = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
+  const update = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
@@ -103,6 +107,34 @@ export function SettingsClient({ settings }: Props) {
                 <div>
                   <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Address</label>
                   <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.address} onChange={e => update('address', e.target.value)} />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">TikTok Live URL</label>
+                  <input
+                    className="input-dark w-full px-4 py-3 rounded-xl text-sm"
+                    value={form.tiktokLiveUrl}
+                    onChange={e => update('tiktokLiveUrl', e.target.value)}
+                    placeholder="https://www.tiktok.com/@yse1876/live"
+                  />
+                  <p className="text-[10px] text-white/25 mt-1.5">When set, a "Watch Live" banner appears on the /live page. Clear to hide it.</p>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 cursor-pointer hover:bg-white/[0.05] transition-colors">
+                    <div>
+                      <p className="text-sm font-semibold text-white">Live Page Enabled</p>
+                      <p className="text-[10px] text-white/25 mt-0.5">Show the "Live Now" banner on the /live page. Requires a TikTok Live URL to be set above.</p>
+                    </div>
+                    <div className="relative flex-shrink-0 ml-4">
+                      <input
+                        type="checkbox"
+                        checked={form.livePageEnabled}
+                        onChange={e => update('livePageEnabled', e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 rounded-full border border-white/10 bg-white/5 peer-checked:bg-gold peer-checked:border-gold transition-colors duration-200" />
+                      <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white/40 peer-checked:bg-black peer-checked:translate-x-5 transition-all duration-200" />
+                    </div>
+                  </label>
                 </div>
               </div>
             </div>
@@ -181,14 +213,13 @@ export function SettingsClient({ settings }: Props) {
               </div>
 
               <div className="pt-2 border-t border-white/5">
-                <form action={logout}>
-                  <button
-                    type="submit"
-                    className="px-4 py-2.5 rounded-xl text-sm font-bold text-red-400 bg-red-400/8 border border-red-400/15 hover:bg-red-400/15 transition-colors"
-                  >
-                    Sign Out of All Sessions
-                  </button>
-                </form>
+                <button
+                  type="button"
+                  onClick={() => startTransition(() => logout())}
+                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-red-400 bg-red-400/8 border border-red-400/15 hover:bg-red-400/15 transition-colors"
+                >
+                  Sign Out of All Sessions
+                </button>
               </div>
             </div>
           </motion.div>

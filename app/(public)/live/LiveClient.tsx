@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { ExternalLink, Radio } from 'lucide-react'
 import { GlassCard, SectionHeader } from '@/components/ui/GlassCard'
+import type { TikTokVideo } from '@/lib/actions/settings'
 
 function TikTokIcon({ className }: { className?: string }) {
   return (
@@ -12,23 +13,15 @@ function TikTokIcon({ className }: { className?: string }) {
   )
 }
 
-const TIKTOK_HANDLE = '@jjwizzle876'
-const TIKTOK_PROFILE_URL = 'https://www.tiktok.com/@jjwizzle876'
-
-// Replace these placeholder video IDs with real TikTok video IDs.
-// Find the ID in a TikTok video URL: tiktok.com/@user/video/VIDEO_ID_HERE
-const TIKTOK_VIDEOS = [
-  { id: '7645145813613595925', label: 'Highlights 2026-05-29' },
-  { id: '7394288267652304134', label: 'Sing Along Sunday 2024-07-21' },
-  { id: '7642391127634578708', label: 'Highlights 2026-05-21' },
-]
-
 interface Props {
+  tiktokHandle: string
+  tiktokProfileUrl: string
   tiktokLiveUrl: string | null
   livePageEnabled: boolean
+  tiktokVideos: TikTokVideo[]
 }
 
-export function LiveClient({ tiktokLiveUrl, livePageEnabled }: Props) {
+export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, livePageEnabled, tiktokVideos }: Props) {
   return (
     <main className="min-h-screen bg-yse-dark pt-24 pb-20">
       {/* Hero */}
@@ -89,11 +82,11 @@ export function LiveClient({ tiktokLiveUrl, livePageEnabled }: Props) {
               <TikTokIcon className="w-9 h-9 text-gold" />
             </div>
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-white">{TIKTOK_HANDLE}</h2>
+              <h2 className="text-2xl font-black tracking-tight text-white">{tiktokHandle}</h2>
               <p className="text-white/50 text-sm mt-1">YardStyle Entertainment</p>
             </div>
             <a
-              href={TIKTOK_PROFILE_URL}
+              href={tiktokProfileUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gold text-black font-bold text-sm tracking-wide hover:bg-gold-light transition-colors duration-200"
@@ -105,73 +98,65 @@ export function LiveClient({ tiktokLiveUrl, livePageEnabled }: Props) {
         </div>
       </section>
 
-      {/* Video embeds */}
-      <section className="max-w-6xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-12 text-center"
-        >
-          <p className="section-label mb-4">Latest Content</p>
-          <h3 className="text-3xl md:text-4xl font-black tracking-tight">Recent Videos</h3>
-        </motion.div>
+      {/* Video embeds — only rendered when there are videos to show */}
+      {tiktokVideos.length > 0 && (
+        <section className="max-w-6xl mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-12 text-center"
+          >
+            <p className="section-label mb-4">Latest Content</p>
+            <h3 className="text-3xl md:text-4xl font-black tracking-tight">Recent Videos</h3>
+          </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {TIKTOK_VIDEOS.map(({ id, label }, i) => (
-            <motion.div
-              key={id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="flex flex-col gap-3"
-            >
-              <p className="text-gold text-xs font-bold uppercase tracking-widest">{label}</p>
-              <div className="rounded-2xl overflow-hidden border border-yse-border bg-yse-card aspect-[9/16]">
-                {id.startsWith('REPLACE') ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-white/30">
-                    <TikTokIcon className="w-10 h-10" />
-                    <p className="text-xs text-center px-4">
-                      Replace <code className="text-gold/60">{id}</code> in{' '}
-                      <code className="text-gold/60">LiveClient.tsx</code> with a real video ID
-                    </p>
-                  </div>
-                ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {tiktokVideos.map(({ id, label }, i) => (
+              <motion.div
+                key={id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="flex flex-col gap-3"
+              >
+                <p className="text-gold text-xs font-bold uppercase tracking-widest">{label}</p>
+                <div className="rounded-2xl overflow-hidden border border-yse-border bg-yse-card aspect-[9/16]">
                   <iframe
                     src={`https://www.tiktok.com/embed/v2/${id}`}
                     className="w-full h-full"
-                    allow="fullscreen"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     allowFullScreen
                     title={label}
                   />
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-16 text-center"
-        >
-          <a
-            href={TIKTOK_PROFILE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-gold/40 text-gold font-bold tracking-wide hover:bg-gold-muted transition-colors duration-200"
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-16 text-center"
           >
-            <TikTokIcon className="w-5 h-5" />
-            View all videos on TikTok
-            <ExternalLink className="w-4 h-4" />
-          </a>
-        </motion.div>
-      </section>
+            <a
+              href={tiktokProfileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-gold/40 text-gold font-bold tracking-wide hover:bg-gold-muted transition-colors duration-200"
+            >
+              <TikTokIcon className="w-5 h-5" />
+              View all videos on TikTok
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          </motion.div>
+        </section>
+      )}
     </main>
   )
 }

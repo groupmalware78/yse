@@ -4,6 +4,8 @@ import { compare, hash } from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { getSession } from './auth'
 
+export type TikTokVideo = { id: string; label: string }
+
 const SETTINGS_DEFAULTS = {
   id: 1,
   siteName: 'YardStyle Entertainment',
@@ -12,15 +14,28 @@ const SETTINGS_DEFAULTS = {
   contactPhone: '+1 (876) 123-4567',
   whatsapp: '+18761234567',
   address: '13 Studio Lane, Kingston 6, Jamaica',
+  tiktokHandle: '@jjwizzle876',
+  tiktokProfileUrl: 'https://www.tiktok.com/@jjwizzle876',
   tiktokLiveUrl: null as string | null,
   livePageEnabled: true,
+  tiktokVideos: [] as TikTokVideo[],
   updatedAt: new Date(),
+}
+
+function parseVideos(raw: string): TikTokVideo[] {
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
 }
 
 export async function getSettings() {
   try {
     const settings = await prisma.siteSettings.findFirst({ where: { id: 1 } })
-    return settings ?? SETTINGS_DEFAULTS
+    if (!settings) return SETTINGS_DEFAULTS
+    return { ...settings, tiktokVideos: parseVideos(settings.tiktokVideos) }
   } catch {
     return SETTINGS_DEFAULTS
   }
@@ -33,13 +48,18 @@ export async function saveSettings(data: {
   contactPhone: string
   whatsapp: string
   address: string
+  tiktokHandle?: string
+  tiktokProfileUrl?: string
   tiktokLiveUrl?: string | null
   livePageEnabled?: boolean
+  tiktokVideos?: TikTokVideo[]
 }) {
+  const { tiktokVideos, ...rest } = data
+  const dbData = { ...rest, tiktokVideos: JSON.stringify(tiktokVideos ?? []) }
   await prisma.siteSettings.upsert({
     where: { id: 1 },
-    update: data,
-    create: { id: 1, ...data },
+    update: dbData,
+    create: { id: 1, ...dbData },
   })
   revalidatePath('/contact')
   revalidatePath('/live')

@@ -7,8 +7,11 @@ export default async function LivePage() {
   const settings = await getSettings()
   return (
     <LiveClient
+      tiktokHandle={settings.tiktokHandle}
+      tiktokProfileUrl={settings.tiktokProfileUrl}
       tiktokLiveUrl={settings.tiktokLiveUrl ?? null}
       livePageEnabled={settings.livePageEnabled ?? true}
+      tiktokVideos={settings.tiktokVideos ?? []}
     />
   )
 }

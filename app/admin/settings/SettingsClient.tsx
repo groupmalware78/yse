@@ -1,10 +1,11 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { motion } from 'framer-motion'
-import { Save, Shield, Globe, Key, Check, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { Save, Shield, Globe, Key, Check, Eye, EyeOff, AlertCircle, Plus, Trash2, Video } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { logout } from '@/lib/actions/auth'
 import { saveSettings, changePassword } from '@/lib/actions/settings'
+import type { TikTokVideo } from '@/lib/actions/settings'
 
 interface Props {
   settings: {
@@ -14,8 +15,11 @@ interface Props {
     contactPhone: string
     whatsapp: string
     address: string
+    tiktokHandle?: string
+    tiktokProfileUrl?: string
     tiktokLiveUrl?: string | null
     livePageEnabled?: boolean | null
+    tiktokVideos?: TikTokVideo[]
   }
 }
 
@@ -34,12 +38,27 @@ export function SettingsClient({ settings }: Props) {
     contactPhone: settings.contactPhone,
     whatsapp: settings.whatsapp,
     address: settings.address,
+    tiktokHandle: settings.tiktokHandle ?? '@jjwizzle876',
+    tiktokProfileUrl: settings.tiktokProfileUrl ?? 'https://www.tiktok.com/@jjwizzle876',
     tiktokLiveUrl: settings.tiktokLiveUrl ?? '',
     livePageEnabled: settings.livePageEnabled ?? true,
+    tiktokVideos: settings.tiktokVideos ?? [] as TikTokVideo[],
   })
 
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const update = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }))
+
+  const addVideo = () =>
+    setForm(f => ({ ...f, tiktokVideos: [...f.tiktokVideos, { id: '', label: '' }] }))
+
+  const removeVideo = (i: number) =>
+    setForm(f => ({ ...f, tiktokVideos: f.tiktokVideos.filter((_, idx) => idx !== i) }))
+
+  const updateVideo = (i: number, k: keyof TikTokVideo, v: string) =>
+    setForm(f => ({
+      ...f,
+      tiktokVideos: f.tiktokVideos.map((vid, idx) => idx === i ? { ...vid, [k]: v } : vid),
+    }))
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,6 +127,14 @@ export function SettingsClient({ settings }: Props) {
                   <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Address</label>
                   <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.address} onChange={e => update('address', e.target.value)} />
                 </div>
+                <div>
+                  <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">TikTok Handle</label>
+                  <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.tiktokHandle} onChange={e => update('tiktokHandle', e.target.value)} placeholder="@jjwizzle876" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">TikTok Profile URL</label>
+                  <input className="input-dark w-full px-4 py-3 rounded-xl text-sm" value={form.tiktokProfileUrl} onChange={e => update('tiktokProfileUrl', e.target.value)} placeholder="https://www.tiktok.com/@jjwizzle876" />
+                </div>
                 <div className="md:col-span-2">
                   <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">TikTok Live URL</label>
                   <input
@@ -137,6 +164,62 @@ export function SettingsClient({ settings }: Props) {
                   </label>
                 </div>
               </div>
+            </div>
+          </motion.div>
+
+          {/* TikTok Videos */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+            className="glass rounded-2xl overflow-hidden border border-white/5 mb-6">
+            <div className="flex items-center justify-between p-5 border-b border-white/5">
+              <div className="flex items-center gap-2">
+                <Video size={15} className="text-gold" />
+                <span className="font-bold text-sm">TikTok Videos</span>
+              </div>
+              <button
+                type="button"
+                onClick={addVideo}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gold/10 border border-gold/20 text-gold text-xs font-bold hover:bg-gold/20 transition-colors"
+              >
+                <Plus size={12} /> Add Video
+              </button>
+            </div>
+            <div className="p-5 space-y-3">
+              {form.tiktokVideos.length === 0 && (
+                <p className="text-white/30 text-xs text-center py-4">No videos added yet. Click &ldquo;Add Video&rdquo; to get started.</p>
+              )}
+              {form.tiktokVideos.map((vid, i) => (
+                <div key={i} className="flex gap-2 items-start">
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1">Video ID</label>
+                      <input
+                        className="input-dark w-full px-3 py-2.5 rounded-xl text-sm"
+                        value={vid.id}
+                        onChange={e => updateVideo(i, 'id', e.target.value)}
+                        placeholder="7645145813613595925"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1">Label</label>
+                      <input
+                        className="input-dark w-full px-3 py-2.5 rounded-xl text-sm"
+                        value={vid.label}
+                        onChange={e => updateVideo(i, 'label', e.target.value)}
+                        placeholder="Highlights 2026-05-29"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeVideo(i)}
+                    className="mt-6 p-2 rounded-lg text-red-400/60 hover:text-red-400 hover:bg-red-400/10 transition-colors flex-shrink-0"
+                    aria-label="Remove video"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+              <p className="text-[10px] text-white/25 pt-1">Find the Video ID in a TikTok URL: tiktok.com/@user/video/<strong className="text-white/40">VIDEO_ID</strong></p>
             </div>
           </motion.div>
 

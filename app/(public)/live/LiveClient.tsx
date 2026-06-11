@@ -19,9 +19,11 @@ interface Props {
   tiktokLiveUrl: string | null
   livePageEnabled: boolean
   tiktokVideos: TikTokVideo[]
+  iframeUrl: string
+  iframeEnabled: boolean
 }
 
-export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, livePageEnabled, tiktokVideos }: Props) {
+export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, livePageEnabled, tiktokVideos, iframeUrl, iframeEnabled }: Readonly<Props>) {
   return (
     <main className="min-h-screen bg-yse-dark pt-24 pb-20">
       {/* Hero */}
@@ -71,6 +73,39 @@ export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, live
               <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </div>
           </motion.a>
+        </section>
+      )}
+
+      {/* Webpage iframe */}
+      {iframeEnabled && iframeUrl && (
+        <section className="max-w-6xl mx-auto px-6 mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="rounded-2xl overflow-hidden border border-yse-border bg-yse-card"
+          >
+            <div className="flex items-center justify-between px-5 py-3 border-b border-yse-border bg-white/[0.03]">
+              <span className="text-[10px] font-bold tracking-widest uppercase text-white/40">Live Stream</span>
+              <a
+                href={iframeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-gold hover:text-gold-light transition-colors"
+              >
+                Open in tab <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src={iframeUrl}
+                className="absolute inset-0 w-full h-full"
+                allow="autoplay; fullscreen; encrypted-media"
+                allowFullScreen
+                title="Live Stream"
+              />
+            </div>
+          </motion.div>
         </section>
       )}
 

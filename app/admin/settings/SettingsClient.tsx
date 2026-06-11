@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { motion } from 'framer-motion'
-import { Save, Shield, Globe, Key, Check, Eye, EyeOff, AlertCircle, Plus, Trash2, Video } from 'lucide-react'
+import { Save, Shield, Globe, Key, Check, Eye, EyeOff, AlertCircle, Plus, Trash2, Video, MonitorPlay } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { logout } from '@/lib/actions/auth'
 import { saveSettings, changePassword } from '@/lib/actions/settings'
@@ -20,6 +20,8 @@ interface Props {
     tiktokLiveUrl?: string | null
     livePageEnabled?: boolean | null
     tiktokVideos?: TikTokVideo[]
+    iframeUrl?: string
+    iframeEnabled?: boolean
   }
 }
 
@@ -43,6 +45,8 @@ export function SettingsClient({ settings }: Props) {
     tiktokLiveUrl: settings.tiktokLiveUrl ?? '',
     livePageEnabled: settings.livePageEnabled ?? true,
     tiktokVideos: settings.tiktokVideos ?? [] as TikTokVideo[],
+    iframeUrl: settings.iframeUrl ?? 'https://www.score808live.tv',
+    iframeEnabled: settings.iframeEnabled ?? true,
   })
 
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
@@ -220,6 +224,43 @@ export function SettingsClient({ settings }: Props) {
                 </div>
               ))}
               <p className="text-[10px] text-white/25 pt-1">Find the Video ID in a TikTok URL: tiktok.com/@user/video/<strong className="text-white/40">VIDEO_ID</strong></p>
+            </div>
+          </motion.div>
+
+          {/* Iframe / Live Stream */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="glass rounded-2xl overflow-hidden border border-white/5 mb-6">
+            <div className="flex items-center gap-2 p-5 border-b border-white/5">
+              <MonitorPlay size={15} className="text-gold" />
+              <span className="font-bold text-sm">Live Stream Embed</span>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">Iframe URL</label>
+                <input
+                  className="input-dark w-full px-4 py-3 rounded-xl text-sm"
+                  value={form.iframeUrl}
+                  onChange={e => update('iframeUrl', e.target.value)}
+                  placeholder="https://www.score808live.tv"
+                />
+                <p className="text-[10px] text-white/25 mt-1.5">URL embedded as an iframe on the /live page. Must allow embedding (no X-Frame-Options: DENY).</p>
+              </div>
+              <label aria-label="Show Iframe on Live Page" className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 cursor-pointer hover:bg-white/[0.05] transition-colors">
+                <div>
+                  <p className="text-sm font-semibold text-white">Show Iframe on Live Page</p>
+                  <p className="text-[10px] text-white/25 mt-0.5">Toggle visibility of the embedded stream on the public /live page.</p>
+                </div>
+                <div className="relative flex-shrink-0 ml-4">
+                  <input
+                    type="checkbox"
+                    checked={form.iframeEnabled}
+                    onChange={e => update('iframeEnabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 rounded-full border border-white/10 bg-white/5 peer-checked:bg-gold peer-checked:border-gold transition-colors duration-200" />
+                  <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white/40 peer-checked:bg-black peer-checked:translate-x-5 transition-all duration-200" />
+                </div>
+              </label>
             </div>
           </motion.div>
 

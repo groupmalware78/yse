@@ -162,5 +162,7 @@ model SiteSettings {
   tiktokLiveUrl   String?
   livePageEnabled Boolean  @default(true)
   tiktokVideos    String   @default("[]")
+  iframeUrl       String   @default("https://www.score808live.tv")
+  iframeEnabled   Boolean  @default(true)
   updatedAt       DateTime @updatedAt
 }

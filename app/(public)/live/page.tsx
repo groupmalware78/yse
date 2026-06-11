@@ -12,6 +12,8 @@ export default async function LivePage() {
       tiktokLiveUrl={settings.tiktokLiveUrl ?? null}
       livePageEnabled={settings.livePageEnabled ?? true}
       tiktokVideos={settings.tiktokVideos ?? []}
+      iframeUrl={settings.iframeUrl ?? 'https://www.score808live.tv'}
+      iframeEnabled={settings.iframeEnabled ?? true}
     />
   )
 }

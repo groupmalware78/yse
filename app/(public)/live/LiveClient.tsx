@@ -101,6 +101,7 @@ export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, live
                 src={iframeUrl}
                 className="absolute inset-0 w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; magnetometer; picture-in-picture; payment"
+                referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
                 title="Live Stream"
               />

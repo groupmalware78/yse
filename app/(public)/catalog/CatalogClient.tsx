@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Play, ExternalLink, LayoutGrid, List, Filter, Music, Disc } from 'lucide-react'
 import type { UIRelease } from '@/lib/queries'
-import { AudiomackPlayer } from '@/components/ui/AudiomackPlayer'
+import { StreamingPlayer, type StreamingPlatform } from '@/components/ui/StreamingPlayer'
 
 const genreColors: Record<string, string> = {
   Dancehall: '#d4af37',
@@ -24,10 +24,25 @@ const streamingPlatforms = [
   { name: 'Audiomack', icon: '▲', color: '#FFA200' },
 ]
 
+const platformIcons: { platform: StreamingPlatform; label: string }[] = [
+  { platform: 'spotify', label: '♫' },
+  { platform: 'apple', label: '♪' },
+  { platform: 'youtube', label: '▶' },
+  { platform: 'tidal', label: '~' },
+  { platform: 'audiomack', label: '▲' },
+]
+
 function AlbumGridCard({ release }: { release: UIRelease }) {
   const accent = genreColors[release.genre] || '#d4af37'
   const letters = release.title.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
-  const [showAudiomack, setShowAudiomack] = useState(false)
+  const [activePlatform, setActivePlatform] = useState<StreamingPlatform | null>(null)
+  const urls: Record<StreamingPlatform, string | null> = {
+    spotify: release.streaming.spotify,
+    apple: release.streaming.apple,
+    youtube: release.streaming.youtube,
+    tidal: release.streaming.tidal,
+    audiomack: release.streaming.audiomack,
+  }
   return (
     <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }}
       className="group glass rounded-2xl overflow-hidden card-hover border border-white/5 hover:border-white/12">
@@ -56,25 +71,19 @@ function AlbumGridCard({ release }: { release: UIRelease }) {
         <p className="text-white/40 text-xs mb-1">{release.artist}</p>
         <p className="text-white/25 text-[10px] mb-4">{release.year} · {release.tracks} tracks · {release.genre}</p>
         <div className="flex gap-1.5">
-          {[
-            { href: release.streaming.spotify, label: '♫' },
-            { href: release.streaming.apple, label: '♪' },
-            { href: release.streaming.youtube, label: '▶' },
-            { href: release.streaming.tidal, label: '~' },
-          ].filter(p => hasUrl(p.href)).map((p, i) => (
-            <a key={i} href={p.href!} target="_blank" rel="noopener noreferrer" className="flex-1 text-center py-2 glass rounded-lg text-xs text-white/40 hover:text-white transition-colors border border-transparent hover:border-white/10">
+          {platformIcons.filter(p => hasUrl(urls[p.platform])).map(p => (
+            <button
+              key={p.platform}
+              onClick={() => setActivePlatform(v => v === p.platform ? null : p.platform)}
+              className={`flex-1 text-center py-2 glass rounded-lg text-xs transition-colors border ${activePlatform === p.platform ? 'text-gold border-gold/30' : 'text-white/40 hover:text-white border-transparent hover:border-white/10'}`}
+            >
               {p.label}
-            </a>
-          ))}
-          {hasUrl(release.streaming.audiomack) && (
-            <button onClick={() => setShowAudiomack(v => !v)} className={`flex-1 text-center py-2 glass rounded-lg text-xs transition-colors border ${showAudiomack ? 'text-gold border-gold/30' : 'text-white/40 hover:text-white border-transparent hover:border-white/10'}`}>
-              ▲
             </button>
-          )}
+          ))}
         </div>
-        {showAudiomack && hasUrl(release.streaming.audiomack) && (
+        {activePlatform && hasUrl(urls[activePlatform]) && (
           <div className="mt-3">
-            <AudiomackPlayer url={release.streaming.audiomack!} />
+            <StreamingPlayer platform={activePlatform} url={urls[activePlatform]!} />
           </div>
         )}
       </div>
@@ -85,30 +94,51 @@ function AlbumGridCard({ release }: { release: UIRelease }) {
 function AlbumListRow({ release, index }: { release: UIRelease; index: number }) {
   const accent = genreColors[release.genre] || '#d4af37'
   const letters = release.title.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+  const [activePlatform, setActivePlatform] = useState<StreamingPlatform | null>(null)
+  const urls: Record<StreamingPlatform, string | null> = {
+    spotify: release.streaming.spotify,
+    apple: release.streaming.apple,
+    youtube: release.streaming.youtube,
+    tidal: release.streaming.tidal,
+    audiomack: release.streaming.audiomack,
+  }
   return (
     <motion.div layout initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.3, delay: index * 0.03 }}
-      className="flex items-center gap-5 p-4 glass rounded-xl border border-white/5 hover:border-white/10 card-hover group">
-      <span className="text-white/20 text-xs w-5 flex-shrink-0 font-mono">{(index + 1).toString().padStart(2, '0')}</span>
-      <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center font-black text-sm"
-        style={{ background: `${accent}20`, border: `1px solid ${accent}30`, color: accent }}>{letters}</div>
-      <div className="flex-1 min-w-0">
-        <p className="font-bold text-sm text-white group-hover:text-gold transition-colors truncate">{release.title}</p>
-        <p className="text-white/35 text-xs">{release.artist} · {release.year}</p>
+      className="p-4 glass rounded-xl border border-white/5 hover:border-white/10 card-hover group">
+      <div className="flex items-center gap-5">
+        <span className="text-white/20 text-xs w-5 flex-shrink-0 font-mono">{(index + 1).toString().padStart(2, '0')}</span>
+        <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center font-black text-sm"
+          style={{ background: `${accent}20`, border: `1px solid ${accent}30`, color: accent }}>{letters}</div>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-sm text-white group-hover:text-gold transition-colors truncate">{release.title}</p>
+          <p className="text-white/35 text-xs">{release.artist} · {release.year}</p>
+        </div>
+        <div className="hidden md:block">
+          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: `${accent}15`, color: accent, border: `1px solid ${accent}25` }}>
+            {release.genre}
+          </span>
+        </div>
+        <span className="hidden lg:block text-white/30 text-xs">{release.tracks} tracks</span>
+        <div className="flex items-center gap-2">
+          {platformIcons.filter(p => hasUrl(urls[p.platform])).map(p => (
+            <button
+              key={p.platform}
+              onClick={() => setActivePlatform(v => v === p.platform ? null : p.platform)}
+              className={`transition-colors ${activePlatform === p.platform ? 'text-gold' : 'text-white/25 hover:text-white'}`}
+            >
+              <ExternalLink size={13} />
+            </button>
+          ))}
+          <button className="w-8 h-8 rounded-full glass flex items-center justify-center text-white/40 hover:text-white transition-colors">
+            <Play size={12} className="ml-0.5" />
+          </button>
+        </div>
       </div>
-      <div className="hidden md:block">
-        <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: `${accent}15`, color: accent, border: `1px solid ${accent}25` }}>
-          {release.genre}
-        </span>
-      </div>
-      <span className="hidden lg:block text-white/30 text-xs">{release.tracks} tracks</span>
-      <div className="flex items-center gap-2">
-        {[release.streaming.spotify, release.streaming.apple].filter(hasUrl).map((href, i) => (
-          <a key={i} href={href!} target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-white transition-colors"><ExternalLink size={13} /></a>
-        ))}
-        <button className="w-8 h-8 rounded-full glass flex items-center justify-center text-white/40 hover:text-white transition-colors">
-          <Play size={12} className="ml-0.5" />
-        </button>
-      </div>
+      {activePlatform && hasUrl(urls[activePlatform]) && (
+        <div className="mt-3">
+          <StreamingPlayer platform={activePlatform} url={urls[activePlatform]!} />
+        </div>
+      )}
     </motion.div>
   )
 }

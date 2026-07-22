@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Play, ExternalLink, ArrowRight, Disc } from 'lucide-react'
 import type { UIRelease } from '@/lib/queries'
 import { SectionHeader } from '@/components/ui/GlassCard'
-import { AudiomackPlayer } from '@/components/ui/AudiomackPlayer'
+import { StreamingPlayer, type StreamingPlatform } from '@/components/ui/StreamingPlayer'
 
 const hasUrl = (url: string | null | undefined) => !!url && url.trim() !== '' && url.trim() !== '#'
 
@@ -18,10 +18,25 @@ const genreColors: Record<string, string> = {
   'Sound System': '#39ff14',
 }
 
+const platformLabels: { platform: StreamingPlatform; label: string }[] = [
+  { platform: 'spotify', label: '♫ Spotify' },
+  { platform: 'apple', label: '♪ Apple' },
+  { platform: 'youtube', label: '▶ YT' },
+  { platform: 'tidal', label: '~ TIDAL' },
+  { platform: 'audiomack', label: '▲ Audiomack' },
+]
+
 function AlbumCard({ release, index }: { release: UIRelease; index: number }) {
   const accent = genreColors[release.genre] || '#d4af37'
   const letters = release.title.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
-  const [showAudiomack, setShowAudiomack] = useState(false)
+  const [activePlatform, setActivePlatform] = useState<StreamingPlatform | null>(null)
+  const urls: Record<StreamingPlatform, string | null> = {
+    spotify: release.streaming.spotify,
+    apple: release.streaming.apple,
+    youtube: release.streaming.youtube,
+    tidal: release.streaming.tidal,
+    audiomack: release.streaming.audiomack,
+  }
 
   return (
     <motion.div
@@ -106,34 +121,19 @@ function AlbumCard({ release, index }: { release: UIRelease; index: number }) {
 
           {/* Streaming icons */}
           <div className="flex items-center gap-2">
-            {[
-              { href: release.streaming.spotify, label: '♫ Spotify' },
-              { href: release.streaming.apple, label: '♪ Apple' },
-              { href: release.streaming.youtube, label: '▶ YT' },
-              { href: release.streaming.tidal, label: '~ TIDAL' },
-            ].filter(s => hasUrl(s.href)).map(s => (
-              <a
-                key={s.label}
-                href={s.href!}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center py-1.5 glass rounded-lg text-[10px] font-semibold text-white/40 hover:text-white transition-colors border border-transparent hover:border-white/10"
-              >
-                {s.label}
-              </a>
-            ))}
-            {hasUrl(release.streaming.audiomack) && (
+            {platformLabels.filter(p => hasUrl(urls[p.platform])).map(p => (
               <button
-                onClick={() => setShowAudiomack(v => !v)}
-                className={`flex-1 text-center py-1.5 glass rounded-lg text-[10px] font-semibold transition-colors border ${showAudiomack ? 'text-gold border-gold/30' : 'text-white/40 hover:text-white border-transparent hover:border-white/10'}`}
+                key={p.platform}
+                onClick={() => setActivePlatform(v => v === p.platform ? null : p.platform)}
+                className={`flex-1 text-center py-1.5 glass rounded-lg text-[10px] font-semibold transition-colors border ${activePlatform === p.platform ? 'text-gold border-gold/30' : 'text-white/40 hover:text-white border-transparent hover:border-white/10'}`}
               >
-                ▲ Audiomack
+                {p.label}
               </button>
-            )}
+            ))}
           </div>
-          {showAudiomack && hasUrl(release.streaming.audiomack) && (
+          {activePlatform && hasUrl(urls[activePlatform]) && (
             <div className="mt-3">
-              <AudiomackPlayer url={release.streaming.audiomack!} />
+              <StreamingPlayer platform={activePlatform} url={urls[activePlatform]!} />
             </div>
           )}
         </div>

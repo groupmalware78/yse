@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import type { UIRelease, UIArtist } from '@/lib/queries'
 
 const typeOptions = ['Album', 'Single', 'EP', 'Live Album', 'Compilation']
-const genreOptions = ['Dancehall', 'Reggae', 'Roots Reggae', 'Dub / Reggae', 'Afrobeats / Reggae', 'Caribbean Fusion', 'Sound System']
+const genreOptions = ['Dancehall', 'Reggae', 'Roots Reggae', 'Dub / Reggae', 'Afrobeats / Reggae', 'Souls / R&B', 'Hip Hop / R&Bs', 'Caribbean Fusion', 'Sound System']
 const genreColors: Record<string, string> = {
   Dancehall: '#d4af37', 'Roots Reggae': '#00ffcc', 'Afrobeats / Reggae': '#ff0077',
   'Caribbean Fusion': '#ff0077', 'Dub / Reggae': '#39ff14', 'Sound System': '#39ff14',

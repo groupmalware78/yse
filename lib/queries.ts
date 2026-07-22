@@ -56,6 +56,7 @@ export async function getReleasesForUI() {
       apple: r.appleUrl ?? null,
       youtube: r.youtubeUrl ?? null,
       tidal: r.tidalUrl ?? null,
+      audiomack: r.audiomackUrl ?? null,
     },
     featured: r.featured,
   }))

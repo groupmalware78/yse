@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Play, ExternalLink, LayoutGrid, List, Filter, Music, Disc } from 'lucide-react'
 import type { UIRelease } from '@/lib/queries'
+import { AudiomackPlayer } from '@/components/ui/AudiomackPlayer'
 
 const genreColors: Record<string, string> = {
   Dancehall: '#d4af37',
@@ -20,11 +21,13 @@ const streamingPlatforms = [
   { name: 'Apple Music', icon: '♪', color: '#FA243C' },
   { name: 'YouTube', icon: '▶', color: '#FF0000' },
   { name: 'TIDAL', icon: '~', color: '#00FFFF' },
+  { name: 'Audiomack', icon: '▲', color: '#FFA200' },
 ]
 
 function AlbumGridCard({ release }: { release: UIRelease }) {
   const accent = genreColors[release.genre] || '#d4af37'
   const letters = release.title.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+  const [showAudiomack, setShowAudiomack] = useState(false)
   return (
     <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }}
       className="group glass rounded-2xl overflow-hidden card-hover border border-white/5 hover:border-white/12">
@@ -67,7 +70,21 @@ function AlbumGridCard({ release }: { release: UIRelease }) {
               {p.label}
             </span>
           ))}
+          {hasUrl(release.streaming.audiomack) ? (
+            <button onClick={() => setShowAudiomack(v => !v)} className={`flex-1 text-center py-2 glass rounded-lg text-xs transition-colors border ${showAudiomack ? 'text-gold border-gold/30' : 'text-white/40 hover:text-white border-transparent hover:border-white/10'}`}>
+              ▲
+            </button>
+          ) : (
+            <span className="flex-1 text-center py-2 glass rounded-lg text-xs text-white/15 border border-transparent cursor-not-allowed opacity-40">
+              ▲
+            </span>
+          )}
         </div>
+        {showAudiomack && hasUrl(release.streaming.audiomack) && (
+          <div className="mt-3">
+            <AudiomackPlayer url={release.streaming.audiomack!} />
+          </div>
+        )}
       </div>
     </motion.div>
   )

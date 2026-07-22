@@ -77,6 +77,7 @@ model Release {
   appleUrl   String?
   youtubeUrl String?
   tidalUrl   String?
+  audiomackUrl String?
   featured   Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

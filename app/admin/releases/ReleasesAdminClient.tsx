@@ -17,7 +17,7 @@ const genreColors: Record<string, string> = {
 type FormData = {
   title: string; artist: string; type: string; year: number; genre: string
   tracks: number; featured: boolean
-  spotifyUrl: string; appleUrl: string; youtubeUrl: string; tidalUrl: string
+  spotifyUrl: string; appleUrl: string; youtubeUrl: string; tidalUrl: string; audiomackUrl: string
 }
 
 function ReleaseModal({ release, artists, onSave, onClose, saving }: {
@@ -35,6 +35,7 @@ function ReleaseModal({ release, artists, onSave, onClose, saving }: {
     appleUrl:   release?.streaming?.apple   !== '#' ? (release?.streaming?.apple   ?? '') : '',
     youtubeUrl: release?.streaming?.youtube !== '#' ? (release?.streaming?.youtube ?? '') : '',
     tidalUrl:   release?.streaming?.tidal   !== '#' ? (release?.streaming?.tidal   ?? '') : '',
+    audiomackUrl: release?.streaming?.audiomack !== '#' ? (release?.streaming?.audiomack ?? '') : '',
   })
   const update = (k: keyof FormData, v: string | number | boolean) => setForm(f => ({ ...f, [k]: v }))
 
@@ -43,6 +44,7 @@ function ReleaseModal({ release, artists, onSave, onClose, saving }: {
     { key: 'appleUrl',    label: 'Apple Music URL', placeholder: 'https://music.apple.com/...' },
     { key: 'youtubeUrl',  label: 'YouTube URL',     placeholder: 'https://youtube.com/playlist/...' },
     { key: 'tidalUrl',    label: 'Tidal URL',       placeholder: 'https://tidal.com/browse/album/...' },
+    { key: 'audiomackUrl', label: 'Audiomack URL',  placeholder: 'https://audiomack.com/album/...' },
   ]
 
   return (
@@ -154,6 +156,7 @@ export function ReleasesAdminClient({ initialReleases, artists }: { initialRelea
         appleUrl:    form.appleUrl    || undefined,
         youtubeUrl:  form.youtubeUrl  || undefined,
         tidalUrl:    form.tidalUrl    || undefined,
+        audiomackUrl: form.audiomackUrl || undefined,
       }
       if (editing?.id) {
         await updateRelease(editing.id, payload)

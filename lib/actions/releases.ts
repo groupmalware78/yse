@@ -19,6 +19,7 @@ export async function createRelease(data: {
   appleUrl?: string
   youtubeUrl?: string
   tidalUrl?: string
+  audiomackUrl?: string
   featured?: boolean
 }) {
   await prisma.release.create({ data })
@@ -39,6 +40,7 @@ export async function updateRelease(id: number, data: Partial<{
   appleUrl: string
   youtubeUrl: string
   tidalUrl: string
+  audiomackUrl: string
 }>) {
   await prisma.release.update({ where: { id }, data })
   revalidatePath('/admin/releases')

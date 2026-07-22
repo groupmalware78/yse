@@ -1,9 +1,11 @@
 'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Play, ExternalLink, ArrowRight, Disc } from 'lucide-react'
 import type { UIRelease } from '@/lib/queries'
 import { SectionHeader } from '@/components/ui/GlassCard'
+import { AudiomackPlayer } from '@/components/ui/AudiomackPlayer'
 
 const hasUrl = (url: string | null | undefined) => !!url && url.trim() !== '' && url.trim() !== '#'
 
@@ -19,6 +21,7 @@ const genreColors: Record<string, string> = {
 function AlbumCard({ release, index }: { release: UIRelease; index: number }) {
   const accent = genreColors[release.genre] || '#d4af37'
   const letters = release.title.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+  const [showAudiomack, setShowAudiomack] = useState(false)
 
   return (
     <motion.div
@@ -107,7 +110,8 @@ function AlbumCard({ release, index }: { release: UIRelease; index: number }) {
               { href: release.streaming.spotify, label: '♫ Spotify' },
               { href: release.streaming.apple, label: '♪ Apple' },
               { href: release.streaming.youtube, label: '▶ YT' },
-            ].map(s => hasUrl(s.href) ? (
+              { href: release.streaming.tidal, label: '~ TIDAL' },
+            ].filter(s => hasUrl(s.href)).map(s => (
               <a
                 key={s.label}
                 href={s.href!}
@@ -117,15 +121,21 @@ function AlbumCard({ release, index }: { release: UIRelease; index: number }) {
               >
                 {s.label}
               </a>
-            ) : (
-              <span
-                key={s.label}
-                className="flex-1 text-center py-1.5 glass rounded-lg text-[10px] font-semibold text-white/15 border border-transparent cursor-not-allowed opacity-40"
-              >
-                {s.label}
-              </span>
             ))}
+            {hasUrl(release.streaming.audiomack) && (
+              <button
+                onClick={() => setShowAudiomack(v => !v)}
+                className={`flex-1 text-center py-1.5 glass rounded-lg text-[10px] font-semibold transition-colors border ${showAudiomack ? 'text-gold border-gold/30' : 'text-white/40 hover:text-white border-transparent hover:border-white/10'}`}
+              >
+                ▲ Audiomack
+              </button>
+            )}
           </div>
+          {showAudiomack && hasUrl(release.streaming.audiomack) && (
+            <div className="mt-3">
+              <AudiomackPlayer url={release.streaming.audiomack!} />
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

@@ -1,8 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ExternalLink, Radio } from 'lucide-react'
-import { GlassCard, SectionHeader } from '@/components/ui/GlassCard'
 import type { TikTokVideo } from '@/lib/actions/settings'
 
 function TikTokIcon({ className }: Readonly<{ className?: string }>) {
@@ -10,6 +10,58 @@ function TikTokIcon({ className }: Readonly<{ className?: string }>) {
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
     </svg>
+  )
+}
+
+// Accepts a YouTube video/live URL, a video ID, or a channel ID / channel URL.
+function getYouTubeEmbedUrl(input: string): string | null {
+  const value = input.trim()
+  if (!value) return null
+  const channel = /(?:youtube\.com\/channel\/)?(UC[\w-]{22})/.exec(value)
+  if (channel) return `https://www.youtube.com/embed/live_stream?channel=${channel[1]}&autoplay=1&mute=1`
+  const video = /(?:v=|youtu\.be\/|\/live\/|\/embed\/|^)([\w-]{11})(?:[?&#/]|$)/.exec(value)
+  if (video) return `https://www.youtube.com/embed/${video[1]}?autoplay=1&mute=1`
+  return null
+}
+
+function getTwitchChannel(input: string): string | null {
+  const match = /^(?:https?:\/\/)?(?:www\.)?(?:twitch\.tv\/)?([a-zA-Z0-9_]{3,25})\/?$/.exec(input.trim())
+  return match ? match[1] : null
+}
+
+function StreamEmbed({ label, src, href, delay }: Readonly<{ label: string; src: string; href: string; delay: number }>) {
+  return (
+    <section className="max-w-6xl mx-auto px-6 mb-12">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay }}
+        className="rounded-2xl overflow-hidden border border-yse-border bg-yse-card"
+      >
+        <div className="flex items-center justify-between px-5 py-3 border-b border-yse-border bg-white/[0.03]">
+          <span className="text-[10px] font-bold tracking-widest uppercase text-white/40">{label}</span>
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-gold hover:text-gold-light transition-colors"
+          >
+            Open in tab <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+          <iframe
+            src={src}
+            className="absolute inset-0 w-full h-full"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+            title={label}
+          />
+        </div>
+      </motion.div>
+    </section>
   )
 }
 
@@ -21,22 +73,49 @@ interface Props {
   tiktokVideos: TikTokVideo[]
   iframeUrl: string
   iframeEnabled: boolean
+  youtubeLiveUrl: string
+  youtubeEnabled: boolean
+  twitchChannel: string
+  twitchEnabled: boolean
 }
 
-export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, livePageEnabled, tiktokVideos, iframeUrl, iframeEnabled }: Readonly<Props>) {
+export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, livePageEnabled, tiktokVideos, iframeUrl, iframeEnabled, youtubeLiveUrl, youtubeEnabled, twitchChannel, twitchEnabled }: Readonly<Props>) {
+  // Twitch embeds require the embedding page's hostname as `parent`, only known client-side
+  const [hostname, setHostname] = useState<string | null>(null)
+  useEffect(() => setHostname(window.location.hostname), [])
+
+  const youtubeEmbedUrl = youtubeEnabled ? getYouTubeEmbedUrl(youtubeLiveUrl) : null
+  const twitchName = twitchEnabled ? getTwitchChannel(twitchChannel) : null
+
   return (
     <main className="min-h-screen bg-yse-dark pt-24 pb-20">
       {/* Hero */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-hero-gradient pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-6 py-16 relative z-10">
-          <SectionHeader
-            label="Follow Along"
-            title={<>YSE on <span className="text-gold">TikTok</span></>}
-            subtitle="Watch exclusive behind-the-scenes content, studio sessions, and live moments from YardStyle Entertainment."
-            center
-          />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-6xl mx-auto px-6 py-8 relative z-10 text-center"
+        >
+          <p className="section-label mb-3">Follow Along</p>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-tight mb-3">
+            YSE on <span className="text-gold">TikTok</span>
+          </h1>
+          <p className="text-white/50 text-sm md:text-base max-w-xl mx-auto leading-relaxed mb-4">
+            Behind-the-scenes content, studio sessions, and live moments from YardStyle Entertainment.
+          </p>
+          <a
+            href={tiktokProfileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-gold font-bold text-sm tracking-wide hover:text-gold-light transition-colors"
+          >
+            <TikTokIcon className="w-4 h-4" />
+            Follow {tiktokHandle} on TikTok
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </motion.div>
       </div>
 
       {/* Live banner — only shown when enabled and a URL is configured */}
@@ -76,67 +155,9 @@ export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, live
         </section>
       )}
 
-      {/* Webpage iframe */}
-      {iframeEnabled && iframeUrl && (
-        <section className="max-w-6xl mx-auto px-6 mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-2xl overflow-hidden border border-yse-border bg-yse-card"
-          >
-            <div className="flex items-center justify-between px-5 py-3 border-b border-yse-border bg-white/[0.03]">
-              <span className="text-[10px] font-bold tracking-widest uppercase text-white/40">Live Stream</span>
-              <a
-                href={iframeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-gold hover:text-gold-light transition-colors"
-              >
-                Open in tab <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                src={iframeUrl}
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; magnetometer; picture-in-picture; payment"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                title="Live Stream"
-              />
-            </div>
-          </motion.div>
-        </section>
-      )}
-
-      {/* Profile card */}
-      <section className="max-w-6xl mx-auto px-6 mb-20">
-        <div className="flex justify-center">
-          <GlassCard gold className="p-8 flex flex-col items-center gap-6 w-full max-w-sm text-center">
-            <div className="w-20 h-20 rounded-full bg-gold-muted border border-gold/30 flex items-center justify-center">
-              <TikTokIcon className="w-9 h-9 text-gold" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-black tracking-tight text-white">{tiktokHandle}</h2>
-              <p className="text-white/50 text-sm mt-1">YardStyle Entertainment</p>
-            </div>
-            <a
-              href={tiktokProfileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gold text-black font-bold text-sm tracking-wide hover:bg-gold-light transition-colors duration-200"
-            >
-              Follow on TikTok
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          </GlassCard>
-        </div>
-      </section>
-
       {/* Video embeds — only rendered when there are videos to show */}
       {tiktokVideos.length > 0 && (
-        <section className="max-w-6xl mx-auto px-6">
+        <section className="max-w-6xl mx-auto px-6 mb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -190,6 +211,61 @@ export function LiveClient({ tiktokHandle, tiktokProfileUrl, tiktokLiveUrl, live
               View all videos on TikTok
               <ExternalLink className="w-4 h-4" />
             </a>
+          </motion.div>
+        </section>
+      )}
+
+      {/* YouTube live stream */}
+      {youtubeEmbedUrl && (
+        <StreamEmbed
+          label="YouTube Live"
+          src={youtubeEmbedUrl}
+          href={youtubeLiveUrl.startsWith('http') ? youtubeLiveUrl : youtubeEmbedUrl}
+          delay={0.1}
+        />
+      )}
+
+      {/* Twitch live stream */}
+      {twitchName && hostname && (
+        <StreamEmbed
+          label="Twitch Live"
+          src={`https://player.twitch.tv/?channel=${twitchName}&parent=${hostname}&muted=true`}
+          href={`https://www.twitch.tv/${twitchName}`}
+          delay={0.15}
+        />
+      )}
+
+      {/* Webpage iframe */}
+      {iframeEnabled && iframeUrl && (
+        <section className="max-w-6xl mx-auto px-6 mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="rounded-2xl overflow-hidden border border-yse-border bg-yse-card"
+          >
+            <div className="flex items-center justify-between px-5 py-3 border-b border-yse-border bg-white/[0.03]">
+              <span className="text-[10px] font-bold tracking-widest uppercase text-white/40">Live Stream</span>
+              <a
+                href={iframeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase text-gold hover:text-gold-light transition-colors"
+              >
+                Open in tab <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src={iframeUrl}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; magnetometer; picture-in-picture; payment"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                title="Live Stream"
+              />
+            </div>
           </motion.div>
         </section>
       )}

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { motion } from 'framer-motion'
-import { Save, Shield, Globe, Key, Check, Eye, EyeOff, AlertCircle, Plus, Trash2, Video, MonitorPlay } from 'lucide-react'
+import { Save, Shield, Globe, Key, Check, Eye, EyeOff, AlertCircle, Plus, Trash2, Video, MonitorPlay, Youtube, Twitch } from 'lucide-react'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 import { logout } from '@/lib/actions/auth'
 import { saveSettings, changePassword } from '@/lib/actions/settings'
@@ -22,6 +22,10 @@ interface Props {
     tiktokVideos?: TikTokVideo[]
     iframeUrl?: string
     iframeEnabled?: boolean
+    youtubeLiveUrl?: string
+    youtubeEnabled?: boolean
+    twitchChannel?: string
+    twitchEnabled?: boolean
   }
 }
 
@@ -47,6 +51,10 @@ export function SettingsClient({ settings }: Props) {
     tiktokVideos: settings.tiktokVideos ?? [] as TikTokVideo[],
     iframeUrl: settings.iframeUrl ?? 'https://www.score808live.tv',
     iframeEnabled: settings.iframeEnabled ?? true,
+    youtubeLiveUrl: settings.youtubeLiveUrl ?? '',
+    youtubeEnabled: settings.youtubeEnabled ?? false,
+    twitchChannel: settings.twitchChannel ?? '',
+    twitchEnabled: settings.twitchEnabled ?? false,
   })
 
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
@@ -255,6 +263,69 @@ export function SettingsClient({ settings }: Props) {
                     type="checkbox"
                     checked={form.iframeEnabled}
                     onChange={e => update('iframeEnabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 rounded-full border border-white/10 bg-white/5 peer-checked:bg-gold peer-checked:border-gold transition-colors duration-200" />
+                  <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white/40 peer-checked:bg-black peer-checked:translate-x-5 transition-all duration-200" />
+                </div>
+              </label>
+            </div>
+          </motion.div>
+
+          {/* YouTube & Twitch */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+            className="glass rounded-2xl overflow-hidden border border-white/5 mb-6">
+            <div className="flex items-center gap-2 p-5 border-b border-white/5">
+              <Youtube size={15} className="text-gold" />
+              <Twitch size={15} className="text-gold" />
+              <span className="font-bold text-sm">YouTube &amp; Twitch Live</span>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5">YouTube Live URL or Channel ID</label>
+                <input
+                  className="input-dark w-full px-4 py-3 rounded-xl text-sm"
+                  value={form.youtubeLiveUrl}
+                  onChange={e => update('youtubeLiveUrl', e.target.value)}
+                  placeholder="https://www.youtube.com/live/VIDEO_ID or UCxxxxxxxxxxxxxxxxxxxxxx"
+                />
+                <p className="text-[10px] text-white/25 mt-1.5">Use a video/live URL for a specific stream, or a channel ID (starts with UC) to always show the channel&apos;s current live stream.</p>
+              </div>
+              <label aria-label="Show YouTube Stream on Live Page" className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 cursor-pointer hover:bg-white/[0.05] transition-colors">
+                <div>
+                  <p className="text-sm font-semibold text-white">Show YouTube Stream on Live Page</p>
+                  <p className="text-[10px] text-white/25 mt-0.5">Embed the YouTube stream on the public /live page.</p>
+                </div>
+                <div className="relative flex-shrink-0 ml-4">
+                  <input
+                    type="checkbox"
+                    checked={form.youtubeEnabled}
+                    onChange={e => update('youtubeEnabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 rounded-full border border-white/10 bg-white/5 peer-checked:bg-gold peer-checked:border-gold transition-colors duration-200" />
+                  <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white/40 peer-checked:bg-black peer-checked:translate-x-5 transition-all duration-200" />
+                </div>
+              </label>
+              <div className="pt-2 border-t border-white/5">
+                <label className="block text-[10px] font-bold tracking-widest uppercase text-white/35 mb-1.5 mt-2">Twitch Channel</label>
+                <input
+                  className="input-dark w-full px-4 py-3 rounded-xl text-sm"
+                  value={form.twitchChannel}
+                  onChange={e => update('twitchChannel', e.target.value)}
+                  placeholder="yardstyle or https://www.twitch.tv/yardstyle"
+                />
+              </div>
+              <label aria-label="Show Twitch Stream on Live Page" className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 cursor-pointer hover:bg-white/[0.05] transition-colors">
+                <div>
+                  <p className="text-sm font-semibold text-white">Show Twitch Stream on Live Page</p>
+                  <p className="text-[10px] text-white/25 mt-0.5">Embed the Twitch channel player on the public /live page.</p>
+                </div>
+                <div className="relative flex-shrink-0 ml-4">
+                  <input
+                    type="checkbox"
+                    checked={form.twitchEnabled}
+                    onChange={e => update('twitchEnabled', e.target.checked)}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 rounded-full border border-white/10 bg-white/5 peer-checked:bg-gold peer-checked:border-gold transition-colors duration-200" />

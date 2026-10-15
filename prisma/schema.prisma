@@ -165,5 +165,9 @@ model SiteSettings {
   tiktokVideos    String   @default("[]")
   iframeUrl       String   @default("https://www.score808live.tv")
   iframeEnabled   Boolean  @default(true)
+  youtubeLiveUrl  String   @default("")
+  youtubeEnabled  Boolean  @default(false)
+  twitchChannel   String   @default("")
+  twitchEnabled   Boolean  @default(false)
   updatedAt       DateTime @updatedAt
 }

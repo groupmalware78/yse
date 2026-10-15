@@ -21,6 +21,10 @@ const SETTINGS_DEFAULTS = {
   tiktokVideos: [] as TikTokVideo[],
   iframeUrl: 'https://www.score808live.tv',
   iframeEnabled: true,
+  youtubeLiveUrl: '',
+  youtubeEnabled: false,
+  twitchChannel: '',
+  twitchEnabled: false,
   updatedAt: new Date(),
 }
 
@@ -57,6 +61,10 @@ export async function saveSettings(data: {
   tiktokVideos?: TikTokVideo[]
   iframeUrl?: string
   iframeEnabled?: boolean
+  youtubeLiveUrl?: string
+  youtubeEnabled?: boolean
+  twitchChannel?: string
+  twitchEnabled?: boolean
 }) {
   const { tiktokVideos, ...rest } = data
   const dbData = { ...rest, tiktokVideos: JSON.stringify(tiktokVideos ?? []) }
